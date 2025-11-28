@@ -1,0 +1,84 @@
+/* ============================================
+   USER SAYFASI ÖZEL STİLLER
+   ============================================ */
+
+body {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    padding: 20px;
+}
+
+.header {
+    border-bottom-color: #3498db;
+}
+
+h1 {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.back-btn {
+    background: #3498db;
+}
+
+.back-btn:hover {
+    background: #2980b9;
+}
+
+.user-select-section {
+    background: #e3f2fd;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    border-left: 5px solid #3498db;
+}
+
+.user-select-section h2 {
+    color: #3498db;
+    margin-bottom: 15px;
+}
+
+.user-select-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 15px;
+    align-items: end;
+}
+
+.section {
+    border-left-color: #3498db;
+}
+
+.section h2 {
+    color: #3498db;
+}
+
+input:focus, select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+button {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+button:hover {
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+thead {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.current-user {
+    background: #e3f2fd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+}
+
+.current-user strong {
+    color: #2980b9;
+}
+
