@@ -78,11 +78,13 @@ nbdist/
 # ============================================
 spring-boot-*.log
 application-*.properties
-!application.properties
 !application.yml
 application-local.properties
 application-dev.properties
 application-prod.properties
+
+# Application properties (herkes kendi şifresini kullanacak)
+backend/src/main/resources/application.properties
 
 # ============================================
 # Environment variables
