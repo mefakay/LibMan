@@ -45,6 +45,13 @@ async function apiRequest(endpoint, options = {}) {
         }
         
         if (!response.ok) {
+            // Validation hatalarını özel olarak handle et
+            if (data && data.errors && typeof data.errors === 'object') {
+                // Validation hataları varsa, tüm hataları birleştir
+                const errorMessages = Object.values(data.errors).join(', ');
+                throw new Error(errorMessages || data.message || 'Validation hatası');
+            }
+            // Normal hata mesajı
             throw new Error(typeof data === 'string' ? data : (data.message || 'Bir hata oluştu'));
         }
         

@@ -3,6 +3,7 @@ package com.library.libman.service;
 import com.library.libman.entity.User;
 import com.library.libman.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class UserService {
     }
     
     // Kullanıcı adına göre kullanıcı bulur
-    public User getUserByUsername(String username) {
+    public User getUserByUsername(@NonNull String username) {
         return userRepository.findByUsername(username)
                    .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + username));
     }
@@ -30,7 +31,7 @@ public class UserService {
 
     
     // ID'ye göre kullanıcı getirir
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> getUserById(@NonNull Long id) {
         return userRepository.findById(id);
     }
 }

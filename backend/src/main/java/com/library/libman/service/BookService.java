@@ -4,6 +4,7 @@ import com.library.libman.entity.Book;
 import com.library.libman.repository.BookRepository;
 import com.library.libman.repository.BorrowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class BookService {
     }
     
     // ID'ye göre kitap getirir
-    public Optional<Book> getBookById(Long id) {
+    public Optional<Book> getBookById(@NonNull Long id) {
         return bookRepository.findById(id);
     }
 
@@ -51,7 +52,7 @@ public class BookService {
     }
     
     // Kitabı siler (önce ilgili ödünç kayıtlarını siler)
-    public void deleteBook(Long id) {
+    public void deleteBook(@NonNull Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + id));
         
@@ -66,7 +67,7 @@ public class BookService {
     }
     
     // Kitap bilgilerini günceller
-    public Book updateBook(Long id, Book updatedBook) {
+    public Book updateBook(@NonNull Long id, Book updatedBook) {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + id));
 

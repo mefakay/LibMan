@@ -9,6 +9,7 @@ import com.library.libman.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public class UserController {
 
     // Başlığa göre kitap arama (büyük/küçük harf duyarlılığı yok)
     @GetMapping("/books/title/{title}")
-    public ResponseEntity<List<Book>> getBooksByTitle(@PathVariable String title) {
+    public ResponseEntity<List<Book>> getBooksByTitle(@PathVariable @NonNull String title) {
         List<Book> books = bookService.getBooksByTitle(title);
         return ResponseEntity.ok(books);
     }
@@ -51,7 +52,7 @@ public class UserController {
     
     // Kitap ödünç alır
     @PostMapping("/borrow/{userId}/{bookId}")
-    public ResponseEntity<?> borrowBook(@PathVariable Long userId, @PathVariable Long bookId) {
+    public ResponseEntity<?> borrowBook(@PathVariable @NonNull Long userId, @PathVariable @NonNull Long bookId) {
         try {
             Borrow borrow = borrowService.borrowBook(userId, bookId);
             return ResponseEntity.status(HttpStatus.CREATED).body(borrow);
@@ -62,7 +63,7 @@ public class UserController {
     
     // Kitabı iade eder
     @PostMapping("/return/{borrowId}")
-    public ResponseEntity<?> returnBook(@PathVariable Long borrowId) {
+    public ResponseEntity<?> returnBook(@PathVariable @NonNull Long borrowId) {
         try {
             Borrow borrow = borrowService.returnBook(borrowId);
             return ResponseEntity.ok(borrow);
@@ -73,21 +74,21 @@ public class UserController {
     
     // Kullanıcının tüm ödünç kayıtlarını getirir
     @GetMapping("/borrows/{userId}")
-    public ResponseEntity<List<Borrow>> getUserBorrows(@PathVariable Long userId) {
+    public ResponseEntity<List<Borrow>> getUserBorrows(@PathVariable @NonNull Long userId) {
         List<Borrow> borrows = borrowService.getUserBorrows(userId);
         return ResponseEntity.ok(borrows);
     }
     
     // Kullanıcının aktif ödünç kayıtlarını getirir
     @GetMapping("/borrows/{userId}/active")
-    public ResponseEntity<List<Borrow>> getUserActiveBorrows(@PathVariable Long userId) {
+    public ResponseEntity<List<Borrow>> getUserActiveBorrows(@PathVariable @NonNull Long userId) {
         List<Borrow> borrows = borrowService.getUserActiveBorrows(userId);
         return ResponseEntity.ok(borrows);
     }
     
     // Kullanıcı adı ile kitap ödünç alır
     @PostMapping("/borrow/username/{username}/{bookId}")
-    public ResponseEntity<?> borrowBookByUsername(@PathVariable String username, @PathVariable Long bookId) {
+    public ResponseEntity<?> borrowBookByUsername(@PathVariable @NonNull String username, @PathVariable @NonNull Long bookId) {
         try {
             User user = userService.getUserByUsername(username);
             Borrow borrow = borrowService.borrowBook(user.getId(), bookId);
@@ -99,7 +100,7 @@ public class UserController {
     
     // Kullanıcı adı ile ödünç kayıtlarını getirir
     @GetMapping("/borrows/username/{username}")
-    public ResponseEntity<?> getUserBorrowsByUsername(@PathVariable String username) {
+    public ResponseEntity<?> getUserBorrowsByUsername(@PathVariable @NonNull String username) {
         try {
             User user = userService.getUserByUsername(username);
             List<Borrow> borrows = borrowService.getUserBorrows(user.getId());
@@ -111,7 +112,7 @@ public class UserController {
     
     // Kullanıcı adı ile aktif ödünç kayıtlarını getirir
     @GetMapping("/borrows/username/{username}/active")
-    public ResponseEntity<?> getUserActiveBorrowsByUsername(@PathVariable String username) {
+    public ResponseEntity<?> getUserActiveBorrowsByUsername(@PathVariable @NonNull String username) {
         try {
             User user = userService.getUserByUsername(username);
             List<Borrow> borrows = borrowService.getUserActiveBorrows(user.getId());
@@ -124,8 +125,8 @@ public class UserController {
     // Kullanıcı adı ve ödünç id'si ile kitap iade eder
     @PostMapping("/return/username/{username}/{borrowId}")
     public ResponseEntity<?> returnBookByUsername(
-            @PathVariable String username,
-            @PathVariable Long borrowId) {
+            @PathVariable @NonNull String username,
+            @PathVariable @NonNull Long borrowId) {
 
         try {
             // 1) Ödünç kaydını getir (mevcut metot)

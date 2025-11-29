@@ -7,6 +7,7 @@ import com.library.libman.repository.BookRepository;
 import com.library.libman.repository.BorrowRepository;
 import com.library.libman.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,7 +29,7 @@ public class BorrowService {
     
     
     // Kitap ödünç alır
-    public Borrow borrowBook(Long userId, Long bookId) {
+    public Borrow borrowBook(@NonNull Long userId, @NonNull Long bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
         
@@ -66,7 +67,7 @@ public class BorrowService {
     }
     
     // Kitabı iade eder
-    public Borrow returnBook(Long borrowId) {
+    public Borrow returnBook(@NonNull Long borrowId) {
         Borrow borrow = borrowRepository.findById(borrowId)
                 .orElseThrow(() -> new RuntimeException("Ödünç kaydı bulunamadı: " + borrowId));
         
@@ -90,7 +91,7 @@ public class BorrowService {
     }
     
     // Kullanıcının tüm ödünç kayıtlarını getirir
-    public List<Borrow> getUserBorrows(Long userId) {
+    public List<Borrow> getUserBorrows(@NonNull Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
         
@@ -99,7 +100,7 @@ public class BorrowService {
     
 
     // Kullanıcının aktif ödünç kayıtlarını getirir
-    public List<Borrow> getUserActiveBorrows(Long userId) {
+    public List<Borrow> getUserActiveBorrows(@NonNull Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
         
@@ -115,7 +116,7 @@ public class BorrowService {
 
     
     // Kullanıcı adı ve kitap ID ile aktif ödünç kaydını bulur
-    public Borrow getActiveBorrowByUsernameAndBook(String username, Long bookId) {
+    public Borrow getActiveBorrowByUsernameAndBook(@NonNull String username, @NonNull Long bookId) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + username));
         

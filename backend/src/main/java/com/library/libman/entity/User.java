@@ -1,6 +1,8 @@
 package com.library.libman.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "users")
@@ -13,19 +15,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    
+    @NotBlank(message = "Kullanıcı adı boş olamaz")
+    @Size(min = 3, max = 50, message = "Kullanıcı adı 3-50 karakter arası olmalı")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", 
+             message = "Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir")
     @Column(nullable = false, unique = true)
     private String username;
     
+    @NotBlank(message = "Şifre boş olamaz")
+    @Size(min = 6, message = "Şifre en az 6 karakter olmalı")
     @Column(nullable = false)
     private String password;
     
+    @NotBlank(message = "Email adresi boş olamaz")
+    @Pattern(regexp = ".*@.*", message = "Email adresi @ işareti içermelidir")
     @Column(nullable = false)
     private String email;
     
+    @NotBlank(message = "Ad soyad boş olamaz")
+    @Size(min = 2, max = 100, message = "Ad soyad 2-100 karakter arası olmalı")
     @Column(nullable = false)
     private String fullName;
     
+    @NotNull(message = "Kullanıcı rolü belirtilmelidir")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -48,8 +60,9 @@ public class User {
     }
     
    
+    @NonNull
     public Long getId() {
-        return id;
+        return id != null ? id : 0L;
     }
     
     public String getUsername() {

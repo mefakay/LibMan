@@ -6,9 +6,11 @@ import com.library.libman.entity.User;
 import com.library.libman.service.BookService;
 import com.library.libman.service.BorrowService;
 import com.library.libman.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class AdminController {
     
     // Yeni kitap ekler
     @PostMapping("/books")
-    public ResponseEntity<?> addBook(@RequestBody Book book) {
+    public ResponseEntity<?> addBook(@Valid @RequestBody Book book) {
         try {
             Book savedBook = bookService.addBook(book);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
@@ -47,7 +49,7 @@ public class AdminController {
     
     // Kitabı siler
     @DeleteMapping("/books/{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<?> deleteBook(@PathVariable @NonNull Long id) {
         try {
             bookService.deleteBook(id);
             return ResponseEntity.ok("Kitap başarıyla silindi");
@@ -58,7 +60,7 @@ public class AdminController {
     
     // Kitap bilgilerini günceller
     @PutMapping("/books/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody Book book) {
+    public ResponseEntity<?> updateBook(@PathVariable @NonNull Long id, @Valid @RequestBody Book book) {
         try {
             Book updatedBook = bookService.updateBook(id, book);
             return ResponseEntity.ok(updatedBook);
@@ -69,7 +71,7 @@ public class AdminController {
     
     // ID'ye göre kitap getirir
     @GetMapping("/books/{id}")
-    public ResponseEntity<?> getBookById(@PathVariable Long id) {
+    public ResponseEntity<?> getBookById(@PathVariable @NonNull Long id) {
         return bookService.getBookById(id)
                 .map(book -> ResponseEntity.ok(book))
                 .orElse(ResponseEntity.notFound().build());
