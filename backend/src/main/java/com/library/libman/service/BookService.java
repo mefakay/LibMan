@@ -25,6 +25,11 @@ public class BookService {
     public Optional<Book> getBookById(Long id) {
         return bookRepository.findById(id);
     }
+
+    // Başlığa göre kitap arama (büyük/küçük harf duyarlılığı yok)
+    public List<Book> getBooksByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
     
     // Yeni kitap ekler
     public Book addBook(Book book) {

@@ -40,6 +40,14 @@ public class UserController {
         List<Book> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
+
+    // Başlığa göre kitap arama (büyük/küçük harf duyarlılığı yok)
+    @GetMapping("/books/title/{title}")
+    public ResponseEntity<List<Book>> getBooksByTitle(@PathVariable String title) {
+        List<Book> books = bookService.getBooksByTitle(title);
+        return ResponseEntity.ok(books);
+    }
+
     
     // Kitap ödünç alır
     @PostMapping("/borrow/{userId}/{bookId}")

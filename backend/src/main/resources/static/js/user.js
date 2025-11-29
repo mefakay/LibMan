@@ -52,7 +52,6 @@ async function borrowBook() {
         showAlert('Kitap başarıyla ödünç alındı!');
         document.getElementById('borrowBookId').value = '';
         getUserBorrows();
-        getAllBooks();
     } catch (error) {
         showAlert('Hata: ' + error.message, true);
     }
@@ -76,7 +75,6 @@ async function returnBook() {
         showAlert('Kitap başarıyla iade edildi!');
         document.getElementById('returnBookId').value = '';
         getUserBorrows();
-        getAllBooks();
     } catch (error) {
         showAlert('Hata: ' + error.message, true);
     }
@@ -124,25 +122,28 @@ function displayBorrowsTable(borrows) {
     container.innerHTML = html;
 }
 
-// Tüm kitapları getir
-async function getAllBooks() {
+// Tüm kitapları göster (arama sonuçları bölümünde)
+async function showAllBooks() {
     try {
         const data = await apiGet('/user/books/all');
-        displayBooksTable(data);
+        displayAllBooksInSearchResults(data);
+        // Arama input'unu sıfırla
+        document.getElementById('searchInput').value = '';
     } catch (error) {
         showAlert('Kitaplar yüklenirken hata oluştu: ' + error.message, true);
     }
 }
 
-// Kitapları göster
-function displayBooksTable(books) {
-    const container = document.getElementById('booksTable');
+// Tüm kitapları arama sonuçları bölümünde göster
+function displayAllBooksInSearchResults(books) {
+    const container = document.getElementById('searchResults');
     if (!books || books.length === 0) {
         container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Henüz kitap eklenmemiş.</p>';
         return;
     }
     
-    let html = '<table><thead><tr><th>ID</th><th>Başlık</th><th>Yazar</th><th>ISBN</th><th>Yıl</th><th>Toplam</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody>';
+    let html = `<p style="padding: 10px; color: #666; font-weight: 600;">Tüm kitaplar (${books.length} adet):</p>`;
+    html += '<table><thead><tr><th>ID</th><th>Başlık</th><th>Yazar</th><th>ISBN</th><th>Yıl</th><th>Toplam</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody>';
     
     books.forEach(book => {
         const available = book.availableCopies > 0;
@@ -164,8 +165,56 @@ function displayBooksTable(books) {
     container.innerHTML = html;
 }
 
-// Sayfa yüklendiğinde kitapları getir
-window.onload = function() {
-    getAllBooks();
-};
+// Kitap ara
+async function searchBooks() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    
+    if (!keyword) {
+        showAlert('Lütfen arama terimi girin!', true);
+        return;
+    }
+    
+    try {
+        // URL'deki özel karakterleri encode et
+        const encodedKeyword = encodeURIComponent(keyword);
+        const data = await apiGet(`/user/books/title/${encodedKeyword}`);
+        displaySearchResults(data, keyword);
+    } catch (error) {
+        showAlert('Arama sırasında hata oluştu: ' + error.message, true);
+    }
+}
+
+// Arama sonuçlarını göster
+function displaySearchResults(books, keyword) {
+    const container = document.getElementById('searchResults');
+    
+    if (!books || books.length === 0) {
+        container.innerHTML = `<p style="padding: 20px; text-align: center; color: #666;">"${keyword}" için sonuç bulunamadı.</p>`;
+        return;
+    }
+    
+    let html = `<p style="padding: 10px; color: #666; font-weight: 600;">"${keyword}" için ${books.length} sonuç bulundu:</p>`;
+    html += '<table><thead><tr><th>ID</th><th>Başlık</th><th>Yazar</th><th>ISBN</th><th>Yıl</th><th>Toplam</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody>';
+    
+    books.forEach(book => {
+        const available = book.availableCopies > 0;
+        html += `
+            <tr>
+                <td>${book.id}</td>
+                <td><strong>${book.title}</strong></td>
+                <td>${book.author}</td>
+                <td>${book.isbn}</td>
+                <td>${book.publicationYear || '-'}</td>
+                <td>${book.totalCopies}</td>
+                <td>${book.availableCopies}</td>
+                <td><span class="badge ${available ? 'available' : 'unavailable'}">${available ? 'Mevcut' : 'Tükendi'}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// Sayfa yüklendiğinde hiçbir şey yapma (kullanıcı arama yapana kadar bekle)
 
