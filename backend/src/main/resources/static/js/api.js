@@ -23,7 +23,26 @@ async function apiRequest(endpoint, options = {}) {
     
     try {
         const response = await fetch(url, config);
-        const data = await response.json().catch(() => response.text());
+        
+        // Response body'yi önce text olarak oku
+        const text = await response.text();
+        
+        // Eğer body boşsa, null döndür
+        if (!text || text.trim() === '') {
+            if (!response.ok) {
+                throw new Error('Bir hata oluştu');
+            }
+            return null;
+        }
+        
+        // JSON'a parse etmeyi dene
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            // JSON değilse, text olarak kullan
+            data = text;
+        }
         
         if (!response.ok) {
             throw new Error(typeof data === 'string' ? data : (data.message || 'Bir hata oluştu'));
@@ -67,5 +86,52 @@ async function apiPut(endpoint, body) {
  */
 async function apiDelete(endpoint) {
     return apiRequest(endpoint, { method: 'DELETE' });
+}
+
+/**
+ * Toast notification gösterir
+ * @param {string} message - Gösterilecek mesaj
+ * @param {string} type - Toast tipi: 'success', 'error', 'info'
+ * @param {number} duration - Kaç saniye gösterilecek (varsayılan: 4000ms)
+ */
+function showToast(message, type = 'info', duration = 4000) {
+    // Toast container'ı oluştur (yoksa)
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    // Toast elementi oluştur
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // İkon belirle
+    const icons = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️'
+    };
+    
+    // Toast içeriği
+    toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+    
+    // Container'a ekle
+    container.appendChild(toast);
+    
+    // Otomatik kaldır
+    setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 300);
+    }, duration);
 }
 

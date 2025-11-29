@@ -211,7 +211,7 @@ tr:hover {
     color: #27ae60;
 }
 
-/* Alert */
+/* Alert (Eski sistem - geriye dönük uyumluluk için) */
 .alert {
     padding: 15px;
     border-radius: 8px;
@@ -233,5 +233,129 @@ tr:hover {
     background: #ffebee;
     color: #e74c3c;
     border-left: 4px solid #e74c3c;
+}
+
+/* Toast Notification */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    min-width: 300px;
+    max-width: 400px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInRight 0.3s ease-out;
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.toast.success {
+    background: #ffffff;
+    color: #27ae60;
+    border: 1px solid #c8e6c9;
+}
+
+.toast.success::before {
+    background: #27ae60;
+}
+
+.toast.error {
+    background: #ffffff;
+    color: #e74c3c;
+    border: 1px solid #ffcdd2;
+}
+
+.toast.error::before {
+    background: #e74c3c;
+}
+
+.toast.info {
+    background: #ffffff;
+    color: #2196f3;
+    border: 1px solid #bbdefb;
+}
+
+.toast.info::before {
+    background: #2196f3;
+}
+
+.toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    opacity: 1;
+}
+
+.toast.hiding {
+    animation: slideOutRight 0.3s ease-in forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
 }
 

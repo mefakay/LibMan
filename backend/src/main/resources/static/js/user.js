@@ -4,14 +4,10 @@
 
 let currentUsername = '';
 
-// Alert göster
+// Alert göster (Toast notification kullanıyor)
 function showAlert(message, isError = false) {
-    const alert = document.getElementById('alert');
-    alert.className = 'alert ' + (isError ? 'error' : 'success') + ' show';
-    alert.textContent = message;
-    setTimeout(() => {
-        alert.classList.remove('show');
-    }, 5000);
+    const type = isError ? 'error' : 'success';
+    showToast(message, type);
 }
 
 // Kullanıcı verilerini yükle
@@ -64,14 +60,14 @@ async function returnBook() {
         return;
     }
     
-    const bookId = document.getElementById('returnBookId').value;
-    if (!bookId) {
-        showAlert('Lütfen kitap ID girin!', true);
+    const borrowId = document.getElementById('returnBookId').value;
+    if (!borrowId) {
+        showAlert('Lütfen ödünç ID girin!', true);
         return;
     }
     
     try {
-        const data = await apiPost(`/user/return/username/${currentUsername}/${bookId}`, {});
+        const data = await apiPost(`/user/return/username/${currentUsername}/${borrowId}`, {});
         showAlert('Kitap başarıyla iade edildi!');
         document.getElementById('returnBookId').value = '';
         getUserBorrows();

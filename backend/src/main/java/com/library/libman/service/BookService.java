@@ -2,6 +2,7 @@ package com.library.libman.service;
 
 import com.library.libman.entity.Book;
 import com.library.libman.repository.BookRepository;
+import com.library.libman.repository.BorrowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class BookService {
     
     @Autowired
     private BookRepository bookRepository;
+    
+    @Autowired
+    private BorrowRepository borrowRepository;
     
     // Tüm kitapları getirir
     public List<Book> getAllBooks() {
@@ -46,11 +50,18 @@ public class BookService {
         return bookRepository.save(book);
     }
     
-    // Kitabı siler
+    // Kitabı siler (önce ilgili ödünç kayıtlarını siler)
     public void deleteBook(Long id) {
-        if (!bookRepository.existsById(id)) {
-            throw new RuntimeException("Kitap bulunamadı: " + id);
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + id));
+        
+        // Önce bu kitaba ait tüm ödünç kayıtlarını sil
+        var borrows = borrowRepository.findByBook(book);
+        if (!borrows.isEmpty()) {
+            borrowRepository.deleteAll(borrows);
         }
+        
+        // Sonra kitabı sil
         bookRepository.deleteById(id);
     }
     

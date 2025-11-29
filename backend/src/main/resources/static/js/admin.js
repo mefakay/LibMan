@@ -19,14 +19,10 @@ function switchTab(tabName) {
     event.target.classList.add('active');
 }
 
-// Alert göster
+// Alert göster (Toast notification kullanıyor)
 function showAlert(message, isError = false) {
-    const alert = document.getElementById('alert');
-    alert.className = 'alert ' + (isError ? 'error' : 'success') + ' show';
-    alert.textContent = message;
-    setTimeout(() => {
-        alert.classList.remove('show');
-    }, 5000);
+    const type = isError ? 'error' : 'success';
+    showToast(message, type);
 }
 
 // ============================================
