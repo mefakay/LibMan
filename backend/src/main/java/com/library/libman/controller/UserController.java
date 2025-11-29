@@ -113,13 +113,24 @@ public class UserController {
         }
     }
     
-    // Kullanıcı adı ve kitap ID ile kitap iade eder
-    @PostMapping("/return/username/{username}/{bookId}")
-    public ResponseEntity<?> returnBookByUsername(@PathVariable String username, @PathVariable Long bookId) {
+    // Kullanıcı adı ve ödünç id'si ile kitap iade eder
+    @PostMapping("/return/username/{username}/{borrowId}")
+    public ResponseEntity<?> returnBookByUsername(
+            @PathVariable String username,
+            @PathVariable Long borrowId) {
+
         try {
-            Borrow borrow = borrowService.getActiveBorrowByUsernameAndBook(username, bookId);
-            Borrow returnedBorrow = borrowService.returnBook(borrow.getId());
-            return ResponseEntity.ok(returnedBorrow);
+            // 1) Ödünç kaydını getir (mevcut metot)
+            Borrow borrow = borrowService.returnBook(borrowId);
+
+            // 2) İade edilen kayıt gerçekten bu kullanıcıya mı ait kontrol edelim
+            if (!borrow.getUser().getUsername().equals(username)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Bu ödünç kaydı belirtilen kullanıcıya ait değil!");
+            }
+
+            return ResponseEntity.ok(borrow);
+
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
