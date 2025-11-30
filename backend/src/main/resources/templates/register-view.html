@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Kütüphane Sistemi</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-card h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 24px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .btn-login {
+            background: #27ae60;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .btn-login:hover {
+            background: #219150;
+        }
+        .error-msg {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        .register-link {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        .register-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h1>📝 Yeni Hesap Oluştur</h1>
+
+    <div th:if="${errorMessage}" class="error-msg">
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <form th:action="@{/api/auth/register}" method="post">
+
+        <div class="form-group">
+            <label>Ad Soyad</label>
+            <input type="text" name="fullName" placeholder="Adınız Soyadınız" required>
+        </div>
+
+        <div class="form-group">
+            <label>Kullanıcı Adı</label>
+            <input type="text" name="username" placeholder="Kullanıcı adı seçin" required>
+        </div>
+
+        <div class="form-group">
+            <label>E-posta</label>
+            <input type="email" name="email" placeholder="ornek@mail.com" required>
+        </div>
+
+        <div class="form-group">
+            <label>Şifre</label>
+            <input type="password" name="password" placeholder="******" required>
+        </div>
+
+        <input type="hidden" name="role" value="USER">
+
+        <button type="submit" class="btn-login">Kayıt Ol</button>
+    </form>
+
+    <div class="register-link">
+        Zaten hesabınız var mı? <a th:href="@{/login}">Giriş Yap</a>
+    </div>
+</div>
+
+</body>
+</html>

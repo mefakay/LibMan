@@ -18,17 +18,17 @@ async function apiRequest(endpoint, options = {}) {
             ...options.headers
         }
     };
-    
+
     const config = { ...defaultOptions, ...options };
-    
+
     try {
         const response = await fetch(url, config);
         const data = await response.json().catch(() => response.text());
-        
+
         if (!response.ok) {
             throw new Error(typeof data === 'string' ? data : (data.message || 'Bir hata oluştu'));
         }
-        
+
         return data;
     } catch (error) {
         throw error;

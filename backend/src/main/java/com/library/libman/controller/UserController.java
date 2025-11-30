@@ -9,6 +9,8 @@ import com.library.libman.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Yeni
+import org.springframework.security.core.Authentication; // Yeni
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,42 +18,48 @@ import java.util.List;
 // Kullanıcı işlemleri için API endpoint'leri
 @RestController
 @RequestMapping("/api/user")
+@PreAuthorize("hasRole('USER') or hasRole('ADMIN')") // USER veya ADMIN rolü gerektirir
 public class UserController {
-    
+
     @Autowired
     private BookService bookService;
-    
+
     @Autowired
     private BorrowService borrowService;
-    
+
     @Autowired
     private UserService userService;
-    
+
     // Ödünç alınabilir kitapları getirir
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAvailableBooks() {
         List<Book> books = bookService.getAvailableBooks();
         return ResponseEntity.ok(books);
     }
-    
+
     // Tüm kitapları getirir (ödünç alınmış olanlar dahil)
     @GetMapping("/books/all")
     public ResponseEntity<List<Book>> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
-    
-    // Kitap ödünç alır
-    @PostMapping("/borrow/{userId}/{bookId}")
-    public ResponseEntity<?> borrowBook(@PathVariable Long userId, @PathVariable Long bookId) {
+
+    /**
+     * Oturum açmış kullanıcının kitap ödünç alması (ID'yi Authentication nesnesinden alır)
+     */
+    @PostMapping("/borrow/{bookId}")
+    public ResponseEntity<?> borrowBook(@PathVariable Long bookId, Authentication authentication) {
         try {
-            Borrow borrow = borrowService.borrowBook(userId, bookId);
+            // Oturum açan kullanıcının adını/ID'sini al
+            User user = userService.getUserByUsername(authentication.getName());
+
+            Borrow borrow = borrowService.borrowBook(user.getId(), bookId);
             return ResponseEntity.status(HttpStatus.CREATED).body(borrow);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    
+
     // Kitabı iade eder
     @PostMapping("/return/{borrowId}")
     public ResponseEntity<?> returnBook(@PathVariable Long borrowId) {
@@ -62,68 +70,26 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    
-    // Kullanıcının tüm ödünç kayıtlarını getirir
-    @GetMapping("/borrows/{userId}")
-    public ResponseEntity<List<Borrow>> getUserBorrows(@PathVariable Long userId) {
-        List<Borrow> borrows = borrowService.getUserBorrows(userId);
+
+    /**
+     * Oturum açmış kullanıcının tüm ödünç kayıtlarını getirir
+     */
+    @GetMapping("/borrows/me")
+    public ResponseEntity<List<Borrow>> getUserBorrows(Authentication authentication) {
+        User user = userService.getUserByUsername(authentication.getName());
+        List<Borrow> borrows = borrowService.getUserBorrows(user.getId());
         return ResponseEntity.ok(borrows);
     }
-    
-    // Kullanıcının aktif ödünç kayıtlarını getirir
-    @GetMapping("/borrows/{userId}/active")
-    public ResponseEntity<List<Borrow>> getUserActiveBorrows(@PathVariable Long userId) {
-        List<Borrow> borrows = borrowService.getUserActiveBorrows(userId);
+
+    /**
+     * Oturum açmış kullanıcının aktif ödünç kayıtlarını getirir
+     */
+    @GetMapping("/borrows/me/active")
+    public ResponseEntity<List<Borrow>> getUserActiveBorrows(Authentication authentication) {
+        User user = userService.getUserByUsername(authentication.getName());
+        List<Borrow> borrows = borrowService.getUserActiveBorrows(user.getId());
         return ResponseEntity.ok(borrows);
     }
-    
-    // Kullanıcı adı ile kitap ödünç alır
-    @PostMapping("/borrow/username/{username}/{bookId}")
-    public ResponseEntity<?> borrowBookByUsername(@PathVariable String username, @PathVariable Long bookId) {
-        try {
-            User user = userService.getUserByUsername(username);
-            Borrow borrow = borrowService.borrowBook(user.getId(), bookId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(borrow);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-    
-    // Kullanıcı adı ile ödünç kayıtlarını getirir
-    @GetMapping("/borrows/username/{username}")
-    public ResponseEntity<?> getUserBorrowsByUsername(@PathVariable String username) {
-        try {
-            User user = userService.getUserByUsername(username);
-            List<Borrow> borrows = borrowService.getUserBorrows(user.getId());
-            return ResponseEntity.ok(borrows);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-    
-    // Kullanıcı adı ile aktif ödünç kayıtlarını getirir
-    @GetMapping("/borrows/username/{username}/active")
-    public ResponseEntity<?> getUserActiveBorrowsByUsername(@PathVariable String username) {
-        try {
-            User user = userService.getUserByUsername(username);
-            List<Borrow> borrows = borrowService.getUserActiveBorrows(user.getId());
-            return ResponseEntity.ok(borrows);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-    
-    // Kullanıcı adı ve kitap ID ile kitap iade eder
-    @PostMapping("/return/username/{username}/{bookId}")
-    public ResponseEntity<?> returnBookByUsername(@PathVariable String username, @PathVariable Long bookId) {
-        try {
-            Borrow borrow = borrowService.getActiveBorrowByUsernameAndBook(username, bookId);
-            Borrow returnedBorrow = borrowService.returnBook(borrow.getId());
-            return ResponseEntity.ok(returnedBorrow);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+
+    // Not: Eski /borrow/username/{username}/{bookId} gibi metodlar güvenlik nedeniyle kaldırıldı veya güncellendi.
 }
-
-
