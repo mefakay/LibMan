@@ -70,7 +70,14 @@
 
     <div class="section">
         <h2>📚 Tüm Kitaplar</h2>
-        <button onclick="getAllBooks()" class="info">🔄 Yenile</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;">
+            <div class="form-group" style="flex: 1; margin: 0;">
+                <label>🔍 Kitap Ara</label>
+                <input type="text" id="searchInput" placeholder="Kitap başlığı ile ara..." />
+            </div>
+            <button onclick="searchBooks()" class="success">🔍 Ara</button>
+            <button onclick="getAllBooks()" class="info">📚 Tümünü Göster</button>
+        </div>
         <div id="booksTable" class="table-container"></div>
     </div>
 
@@ -88,6 +95,16 @@
             loadUserData();
             getMyBorrowRequests();
         }, 500);
+        
+        // Enter tuşu ile arama yapma
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchBooks();
+                }
+            });
+        }
     };
 </script>
 </body>

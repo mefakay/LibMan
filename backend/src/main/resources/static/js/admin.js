@@ -367,10 +367,87 @@ function displayBorrowsTable(borrows) {
     container.innerHTML = html;
 }
 
+// ============================================
+// KİTAP ARAMA FONKSİYONLARI
+// ============================================
+
+// Kitap ara
+async function searchBooks() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    
+    if (!keyword) {
+        showAlert('Lütfen arama terimi girin!', true);
+        return;
+    }
+    
+    try {
+        // URL'deki özel karakterleri encode et
+        const encodedKeyword = encodeURIComponent(keyword);
+        // Admin için user endpoint'ini kullanabiliriz (her ikisi de aynı servisi kullanıyor)
+        const data = await apiGet(`/user/books/title/${encodedKeyword}`);
+        displaySearchResults(data, keyword);
+    } catch (error) {
+        showAlert('Arama sırasında hata oluştu: ' + error.message, true);
+    }
+}
+
+// Arama sonuçlarını göster (booksTable'a yazıyor)
+function displaySearchResults(books, keyword) {
+    const container = document.getElementById('booksTable');
+    
+    if (!books || books.length === 0) {
+        container.innerHTML = `<p style="padding: 20px; text-align: center; color: #666;">"${keyword}" için sonuç bulunamadı.</p>`;
+        return;
+    }
+    
+    let html = `<p style="padding: 10px; color: #666; font-weight: 600;">"${keyword}" için ${books.length} sonuç bulundu:</p>`;
+    html += '<table><thead><tr><th>ID</th><th>Başlık</th><th>Yazar</th><th>ISBN</th><th>Yıl</th><th>Toplam</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody>';
+    
+    books.forEach(book => {
+        const available = book.availableCopies > 0;
+        html += `
+            <tr>
+                <td>${book.id}</td>
+                <td><strong>${book.title}</strong></td>
+                <td>${book.author}</td>
+                <td>${book.isbn}</td>
+                <td>${book.publicationYear || '-'}</td>
+                <td>${book.totalCopies}</td>
+                <td>${book.availableCopies}</td>
+                <td><span class="badge ${available ? 'available' : 'unavailable'}">${available ? 'Mevcut' : 'Tükendi'}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
 // Sayfa yüklendiğinde kitapları ve bekleyen istekleri getir
 window.onload = function() {
     getAllBooks();
     // Bekleyen istekleri de yükle (arka planda)
     setTimeout(getPendingRequests, 500);
+    
+    // Enter tuşu ile arama yapma
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBooks();
+            }
+        });
+    }
+    
+    // Tümünü Göster butonuna tıklanınca arama input'unu temizle
+    const showAllBtn = document.querySelector('button[onclick="getAllBooks()"]');
+    if (showAllBtn) {
+        showAllBtn.addEventListener('click', function() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+        });
+    }
 };
 

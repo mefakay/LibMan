@@ -234,48 +234,6 @@ function displayBorrowsTable(borrows) {
     container.innerHTML = html;
 }
 
-// Tüm kitapları göster (arama sonuçları bölümünde)
-async function showAllBooks() {
-    try {
-        const data = await apiGet('/user/books/all');
-        displayAllBooksInSearchResults(data);
-        // Arama input'unu sıfırla
-        document.getElementById('searchInput').value = '';
-    } catch (error) {
-        showAlert('Kitaplar yüklenirken hata oluştu: ' + error.message, true);
-    }
-}
-
-// Tüm kitapları arama sonuçları bölümünde göster
-function displayAllBooksInSearchResults(books) {
-    const container = document.getElementById('searchResults');
-    if (!books || books.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Henüz kitap eklenmemiş.</p>';
-        return;
-    }
-    
-    let html = `<p style="padding: 10px; color: #666; font-weight: 600;">Tüm kitaplar (${books.length} adet):</p>`;
-    html += '<table><thead><tr><th>ID</th><th>Başlık</th><th>Yazar</th><th>ISBN</th><th>Yıl</th><th>Toplam</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody>';
-    
-    books.forEach(book => {
-        const available = book.availableCopies > 0;
-        html += `
-            <tr>
-                <td>${book.id}</td>
-                <td><strong>${book.title}</strong></td>
-                <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.publicationYear || '-'}</td>
-                <td>${book.totalCopies}</td>
-                <td>${book.availableCopies}</td>
-                <td><span class="badge ${available ? 'available' : 'unavailable'}">${available ? 'Mevcut' : 'Tükendi'}</span></td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
 
 // Kitap ara
 async function searchBooks() {
@@ -296,9 +254,9 @@ async function searchBooks() {
     }
 }
 
-// Arama sonuçlarını göster
+// Arama sonuçlarını göster (booksTable'a yazıyor)
 function displaySearchResults(books, keyword) {
-    const container = document.getElementById('searchResults');
+    const container = document.getElementById('booksTable');
     
     if (!books || books.length === 0) {
         container.innerHTML = `<p style="padding: 20px; text-align: center; color: #666;">"${keyword}" için sonuç bulunamadı.</p>`;
