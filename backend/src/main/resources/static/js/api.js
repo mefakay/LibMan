@@ -23,17 +23,27 @@ async function apiRequest(endpoint, options = {}) {
 
     try {
         const response = await fetch(url, config);
-        const data = await response.json().catch(() => response.text());
+        
+        // Response body'yi bir kez oku
+        const text = await response.text();
+        
+        // JSON parse etmeye çalış, başarısız olursa text olarak kullan
+        let data;
+        try {
+            data = text ? JSON.parse(text) : null;
+        } catch (e) {
+            data = text;
+        }
 
         if (!response.ok) {
             // Validation hatalarını özel olarak handle et
-            if (data && data.errors && typeof data.errors === 'object') {
+            if (data && typeof data === 'object' && data.errors) {
                 // Validation hataları varsa, tüm hataları birleştir
                 const errorMessages = Object.values(data.errors).join(', ');
                 throw new Error(errorMessages || data.message || 'Validation hatası');
             }
             // Normal hata mesajı
-            throw new Error(typeof data === 'string' ? data : (data.message || 'Bir hata oluştu'));
+            throw new Error(typeof data === 'string' ? data : (data && data.message ? data.message : 'Bir hata oluştu'));
         }
 
         return data;

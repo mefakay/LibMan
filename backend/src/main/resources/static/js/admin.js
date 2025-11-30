@@ -188,6 +188,147 @@ function displayUsersTable(users) {
 }
 
 // ============================================
+// ÖDÜNÇ İSTEKLERİ YÖNETİMİ
+// ============================================
+
+// Bekleyen istekleri getir
+async function getPendingRequests() {
+    try {
+        const data = await apiGet('/admin/borrow-requests/pending');
+        // Sadece PENDING olanları filtrele
+        const pendingRequests = data.filter(r => r.status === 'PENDING');
+        displayPendingRequestsTable(pendingRequests);
+    } catch (error) {
+        showAlert('Bekleyen istekler yüklenirken hata oluştu: ' + error.message, true);
+    }
+}
+
+// Tüm istekleri getir
+async function getAllRequests() {
+    try {
+        const data = await apiGet('/admin/borrow-requests/pending');
+        displayAllRequestsTable(data);
+    } catch (error) {
+        showAlert('İstekler yüklenirken hata oluştu: ' + error.message, true);
+    }
+}
+
+// Bekleyen istekleri tabloda göster (Onayla/Reddet butonlarıyla)
+function displayPendingRequestsTable(requests) {
+    const container = document.getElementById('pendingRequestsTable');
+    if (!container) return;
+    
+    if (!requests || requests.length === 0) {
+        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Bekleyen ödünç isteği yok.</p>';
+        return;
+    }
+    
+    let html = '<table><thead><tr><th>ID</th><th>Kullanıcı</th><th>Kitap</th><th>İstek Tarihi</th><th>İşlemler</th></tr></thead><tbody>';
+    
+    requests.forEach(request => {
+        html += `
+            <tr>
+                <td>${request.id}</td>
+                <td><strong>${request.user.username}</strong><br><small>${request.user.fullName}</small></td>
+                <td><strong>${request.book.title}</strong><br><small>${request.book.author}</small></td>
+                <td>${request.requestDate}</td>
+                <td>
+                    <button class="success" onclick="approveRequest(${request.id})" style="margin-right: 5px; padding: 5px 10px; font-size: 12px;">✅ Onayla</button>
+                    <button class="danger" onclick="rejectRequest(${request.id})" style="padding: 5px 10px; font-size: 12px;">❌ Reddet</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// Tüm istekleri tabloda göster
+function displayAllRequestsTable(requests) {
+    const container = document.getElementById('allRequestsTable');
+    if (!container) return;
+    
+    if (!requests || requests.length === 0) {
+        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Henüz ödünç isteği yok.</p>';
+        return;
+    }
+    
+    let html = '<table><thead><tr><th>ID</th><th>Kullanıcı</th><th>Kitap</th><th>İstek Tarihi</th><th>İşlem Tarihi</th><th>Durum</th></tr></thead><tbody>';
+    
+    requests.forEach(request => {
+        let statusClass = '';
+        let statusText = '';
+        
+        switch(request.status) {
+            case 'PENDING':
+                statusClass = 'pending';
+                statusText = '⏳ Beklemede';
+                break;
+            case 'APPROVED':
+                statusClass = 'available';
+                statusText = '✅ Onaylandı';
+                break;
+            case 'REJECTED':
+                statusClass = 'unavailable';
+                statusText = '❌ Reddedildi';
+                break;
+            default:
+                statusClass = '';
+                statusText = request.status;
+        }
+        
+        html += `
+            <tr>
+                <td>${request.id}</td>
+                <td><strong>${request.user.username}</strong><br><small>${request.user.fullName}</small></td>
+                <td><strong>${request.book.title}</strong><br><small>${request.book.author}</small></td>
+                <td>${request.requestDate}</td>
+                <td>${request.processedDate || '-'}</td>
+                <td><span class="badge ${statusClass}">${statusText}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// İsteği onayla
+async function approveRequest(requestId) {
+    if (!confirm('Bu ödünç isteğini onaylamak istediğinizden emin misiniz?')) {
+        return;
+    }
+    
+    try {
+        await apiPost(`/admin/borrow-requests/${requestId}/approve`, {});
+        showAlert('Ödünç isteği onaylandı! Kitap kullanıcıya verildi.');
+        getPendingRequests();
+        getAllRequests();
+        getAllBooks(); // Kitap listesini güncelle
+    } catch (error) {
+        showAlert('Hata: ' + error.message, true);
+    }
+}
+
+// İsteği reddet
+async function rejectRequest(requestId) {
+    if (!confirm('Bu ödünç isteğini reddetmek istediğinizden emin misiniz?')) {
+        return;
+    }
+    
+    try {
+        await apiPost(`/admin/borrow-requests/${requestId}/reject`, {});
+        showAlert('Ödünç isteği reddedildi.');
+        getPendingRequests();
+        getAllRequests();
+        getAllBooks(); // Kitap listesini güncelle
+    } catch (error) {
+        showAlert('Hata: ' + error.message, true);
+    }
+}
+
+// ============================================
 // ÖDÜNÇ KAYITLARI
 // ============================================
 
@@ -226,8 +367,10 @@ function displayBorrowsTable(borrows) {
     container.innerHTML = html;
 }
 
-// Sayfa yüklendiğinde kitapları getir
+// Sayfa yüklendiğinde kitapları ve bekleyen istekleri getir
 window.onload = function() {
     getAllBooks();
+    // Bekleyen istekleri de yükle (arka planda)
+    setTimeout(getPendingRequests, 500);
 };
 

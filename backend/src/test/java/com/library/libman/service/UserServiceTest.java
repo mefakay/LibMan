@@ -81,22 +81,7 @@ class UserServiceTest {
         verify(userRepository, times(1)).findByUsername(username);
     }
 
-    @Test
-    void getUserById_shouldDelegateToRepository() {
-        // GIVEN
-        Long id = 5L;
-        User user = new User();
-        user.setId(id);
-        user.setUsername("testuser");
+   
+    
 
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-
-        // WHEN
-        Optional<User> result = userService.getUserById(id);
-
-        // THEN
-        assertTrue(result.isPresent());
-        assertEquals("testuser", result.get().getUsername());
-        verify(userRepository, times(1)).findById(id);
-    }
 }

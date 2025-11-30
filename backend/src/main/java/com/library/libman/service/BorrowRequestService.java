@@ -65,7 +65,7 @@ public class BorrowRequestService {
         BorrowRequest borrowRequest = new BorrowRequest();
         borrowRequest.setUser(user);
         borrowRequest.setBook(book);
-        borrowRequest.setrequestDate(LocalDate.now());
+        borrowRequest.setRequestDate(LocalDate.now());
         borrowRequest.setStatus(BorrowRequest.RequestStatus.PENDING);
         
         //Rezerve içim kitabın mevcut kopya sayısını azalt
@@ -86,7 +86,7 @@ public class BorrowRequestService {
         }
         
         // Borrow request'i güncelle
-        borrowRequest.setprocessedDate(LocalDate.now());
+        borrowRequest.setProcessedDate(LocalDate.now());
         borrowRequest.setStatus(BorrowRequest.RequestStatus.APPROVED);
         borrowRequestRepository.save(borrowRequest);
 
@@ -110,7 +110,7 @@ public class BorrowRequestService {
         }
         
         request.setStatus(BorrowRequest.RequestStatus.REJECTED);
-        request.setprocessedDate(LocalDate.now());
+        request.setProcessedDate(LocalDate.now());
 
         Book book = bookRepository.findById(request.getBook().getId())
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + request.getBook().getId()));

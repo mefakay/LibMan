@@ -64,11 +64,11 @@ public class BorrowRequest {
         return book;
     }
     
-    public LocalDate getrequestDate() {
+    public LocalDate getRequestDate() {
         return requestDate;
     }
     
-    public LocalDate getprocessedDate() {
+    public LocalDate getProcessedDate() {
         return processedDate;
     }
     
@@ -89,11 +89,11 @@ public class BorrowRequest {
         this.book = book;
     }
     
-    public void setrequestDate(LocalDate requestDate) {
+    public void setRequestDate(LocalDate requestDate) {
         this.requestDate = requestDate;
     }
     
-    public void setprocessedDate(LocalDate processedDate) {
+    public void setProcessedDate(LocalDate processedDate) {
         this.processedDate = processedDate;
     }
     

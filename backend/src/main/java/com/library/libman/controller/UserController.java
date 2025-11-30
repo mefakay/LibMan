@@ -122,5 +122,57 @@ public class UserController {
         }
     }
 
-    // Not: Eski /borrow/username/{username}/{bookId} gibi metodlar güvenlik nedeniyle kaldırıldı veya güncellendi.
+    // ============================================
+    // ESKİ FRONTEND İLE UYUMLULUK İÇİN ENDPOINT'LER
+    // ============================================
+    
+    /**
+     * Kullanıcı adıyla kitap ödünç alma (Eski frontend için)
+     */
+    @PostMapping("/borrow/username/{username}/{bookId}")
+    public ResponseEntity<?> borrowBookByUsername(@PathVariable @NonNull String username, @PathVariable @NonNull Long bookId) {
+        try {
+            User user = userService.getUserByUsername(username);
+            Borrow borrow = borrowService.borrowBook(user.getId(), bookId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(borrow);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Kullanıcı adıyla kitap iade (Eski frontend için)
+     */
+    @PostMapping("/return/username/{username}/{borrowId}")
+    public ResponseEntity<?> returnBookByUsername(@PathVariable @NonNull String username, @PathVariable @NonNull Long borrowId) {
+        try {
+            Borrow borrow = borrowService.returnBook(borrowId);
+            return ResponseEntity.ok(borrow);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Kullanıcı adıyla ödünç kayıtlarını getir (Eski frontend için)
+     */
+    @GetMapping("/borrows/username/{username}")
+    public ResponseEntity<?> getUserBorrowsByUsername(@PathVariable @NonNull String username) {
+        try {
+            User user = userService.getUserByUsername(username);
+            List<Borrow> borrows = borrowService.getUserBorrows(user.getId());
+            return ResponseEntity.ok(borrows);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Başlığa göre kitap arama
+     */
+    @GetMapping("/books/title/{title}")
+    public ResponseEntity<List<Book>> getBooksByTitle(@PathVariable @NonNull String title) {
+        List<Book> books = bookService.getBooksByTitle(title);
+        return ResponseEntity.ok(books);
+    }
 }

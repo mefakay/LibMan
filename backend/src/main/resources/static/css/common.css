@@ -211,6 +211,21 @@ tr:hover {
     color: #27ae60;
 }
 
+.badge.pending, .badge.PENDING {
+    background: #fff8e1;
+    color: #f57c00;
+}
+
+.badge.APPROVED {
+    background: #e8f5e9;
+    color: #27ae60;
+}
+
+.badge.REJECTED {
+    background: #ffebee;
+    color: #e74c3c;
+}
+
 /* Alert (Eski sistem - geriye dönük uyumluluk için) */
 .alert {
     padding: 15px;

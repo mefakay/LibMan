@@ -19,6 +19,7 @@
     <div class="tabs">
         <button class="tab active" onclick="switchTab('books')">📚 Kitap Yönetimi</button>
         <button class="tab" onclick="switchTab('users')">👥 Kullanıcı Yönetimi</button>
+        <button class="tab" onclick="switchTab('requests')">📝 Ödünç İstekleri</button>
         <button class="tab" onclick="switchTab('borrows')">📖 Ödünç Kayıtları</button>
     </div>
 
@@ -107,6 +108,20 @@
             <h2>👥 Tüm Kullanıcılar</h2>
             <button onclick="getAllUsers()" class="success">🔄 Yenile</button>
             <div id="usersTable" class="table-container"></div>
+        </div>
+    </div>
+
+    <div id="requests" class="tab-content">
+        <div class="section">
+            <h2>📝 Bekleyen Ödünç İstekleri</h2>
+            <button onclick="getPendingRequests()" class="success">🔄 Yenile</button>
+            <div id="pendingRequestsTable" class="table-container"></div>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Tüm Ödünç İstekleri</h2>
+            <button onclick="getAllRequests()" class="info">🔄 Tümünü Göster</button>
+            <div id="allRequestsTable" class="table-container"></div>
         </div>
     </div>
 
