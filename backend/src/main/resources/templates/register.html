@@ -3,92 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kayıt Ol - Kütüphane Sistemi</title>
+    <title>Kayıt Ol - Lib-Man</title>
+
     <style>
+
+        /* Mint Arka Plan */
         body {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            background: linear-gradient(135deg, #b2f7ef 0%, #5ccccc 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 20px;
         }
+
+        /* Card */
         .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: #ffffff;
             width: 100%;
-            max-width: 400px;
+            max-width: 430px;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,100,100,0.15);
+            border: 1px solid #c8e7e7;
         }
+
         .login-card h1 {
-            color: #2c3e50;
-            margin-bottom: 25px;
-            font-size: 24px;
             text-align: center;
+            color: #0f7f7f;
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 26px;
         }
+
+        /* Form */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            color: #666;
+            color: #005a5a;
             font-size: 13px;
             font-weight: 600;
+            margin-bottom: 5px;
         }
+
         .form-group input {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            box-sizing: border-box;
+            padding: 12px;
             font-size: 14px;
-            transition: all 0.3s;
+            border-radius: 8px;
+            border: 2px solid #c8e7e7;
+            background: #eafffa;
+            transition: .25s;
+            color: #004a4a;
         }
+
         .form-group input:focus {
-            border-color: #3498db;
+            border-color: #14b8b8;
+            box-shadow: 0 0 0 3px rgba(20,184,184,.2);
             outline: none;
         }
+
+        /* Register Button */
         .btn-login {
-            background: #27ae60;
-            color: white;
-            border: none;
             width: 100%;
             padding: 12px;
+            background: linear-gradient(135deg, #14b8b8 0%, #0f7f7f 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            font-weight: 600;
+            transition: .25s;
             margin-top: 10px;
-            transition: background 0.3s;
         }
+
         .btn-login:hover {
-            background: #219150;
+            box-shadow: 0 8px 15px rgba(0,150,150,0.25);
+            transform: translateY(-2px);
         }
+
+        /* Error Box */
         .error-msg {
-            background-color: #ffebee;
+            background: #ffefef;
             color: #c62828;
             padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 13px;
-        }
-        .register-link {
-            margin-top: 20px;
-            text-align: center;
+            border-radius: 8px;
             font-size: 14px;
-            color: #666;
-        }
-        .register-link a {
-            color: #3498db;
-            text-decoration: none;
+            margin-bottom: 18px;
             font-weight: 600;
         }
+
+        .register-link {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            color: #004f4f;
+        }
+
+        .register-link a {
+            color: #0f7f7f;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
+
 <body>
 
 <div class="login-card">
@@ -122,7 +152,7 @@
 
         <input type="hidden" name="role" value="USER">
 
-        <button type="submit" class="btn-login">Kayıt Ol</button>
+        <button class="btn-login">Kayıt Ol</button>
     </form>
 
     <div class="register-link">
@@ -132,4 +162,3 @@
 
 </body>
 </html>
-

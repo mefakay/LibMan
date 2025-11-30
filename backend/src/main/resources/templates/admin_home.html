@@ -3,146 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👨‍💼 Yönetici Paneli</title>
-    <link rel="stylesheet" href="/css/common.css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <title>👨‍💼 Yönetici Paneli | Lib-Man</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        /* ============================================
+           ADMIN PANEL — SU YEŞİLİ + GRİ MODERN TEMA
+        ============================================ */
+
+        body {
+            background: #eef5f5; /* soft gri-mint */
+            color: #004a4a;
+            font-family: "Inter", sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background: none !important;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background-color: #0f7f7f !important;    /* koyu su yeşili */
+            border-bottom: 3px solid #14b8b8;
+        }
+
+        .navbar-brand {
+            color: #eafffa !important;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #d8fffd !important;
+            font-weight: 500;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            border-bottom: 2px solid #b2f7ef;
+        }
+
+        /* TABS */
+        .nav-tabs .nav-link {
+            background: #e7f7f7;
+            color: #0c5f5f;
+            font-weight: 600;
+            border: 1px solid #b2dede;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: #14b8b8;
+            color: white !important;
+            border-color: #0fa5a5;
+            box-shadow: 0 4px 8px rgba(0,100,100,0.25);
+        }
+
+        /* KARTLAR */
+        .card {
+            background-color: #f9fdfd;
+            border: 1px solid #c8e7e7;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 80, 80, 0.08);
+        }
+
+        .card-header {
+            background-color: #14b8b8 !important;
+            color: white;
+            border-bottom: 1px solid #0f7f7f;
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+
+        /* FORM */
+        .form-control {
+            border: 1.8px solid #14b8b8 !important;
+            background: white !important;
+            color: #004f4f !important;
+        }
+
+        .form-control:focus {
+            border-color: #0f7f7f !important;
+            box-shadow: 0 0 0 3px rgba(0,170,170,0.15);
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background: #14b8b8;
+            border-color: #14b8b8;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #0f7f7f;
+            border-color: #0f7f7f;
+        }
+
+        .btn-secondary {
+            background-color: #8abbbb;
+            border-color: #8abbbb;
+            color: #003d3d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #72a5a5;
+        }
+
+        .btn-danger {
+            background-color: #e57373;
+            border-color: #e57373;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #f4d06f;
+            border-color: #f4d06f;
+            color: #004b4b !important;
+        }
+
+        .btn-success {
+            background-color: #28c76f;
+            border-color: #28c76f;
+        }
+
+        /* TABLE AREA */
+        #booksTable, #usersTable, #pendingRequestsTable, #allRequestsTable, #borrowsTable {
+            color: #003d3d;
+        }
+
+    </style>
+
 </head>
+
 <body>
-<div class="container">
-    <div class="header">
-        <h1>👨‍💼 Yönetici Paneli</h1>
-        <form th:action="@{/logout}" method="post" style="margin:0;">
-            <button type="submit" class="danger">🚪 Çıkış Yap</button>
-        </form>
-    </div>
 
-    <div class="tabs">
-        <button class="tab active" onclick="switchTab('books')">📚 Kitap Yönetimi</button>
-        <button class="tab" onclick="switchTab('users')">👥 Kullanıcı Yönetimi</button>
-        <button class="tab" onclick="switchTab('requests')">📝 Ödünç İstekleri</button>
-        <button class="tab" onclick="switchTab('borrows')">📖 Ödünç Kayıtları</button>
-    </div>
+<nav class="navbar navbar-expand-lg navbar-dark shadow-lg">
+    <div class="container-fluid container">
+        <a class="navbar-brand fw-bold"><i class="fas fa-crown me-2"></i> Lib-Man Admin</a>
 
-    <div id="books" class="tab-content active">
-        <div class="section">
-            <h2>➕ Yeni Kitap Ekle</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Kitap Başlığı *</label>
-                    <input type="text" id="bookTitle" placeholder="Örn: Suç ve Ceza">
-                </div>
-                <div class="form-group">
-                    <label>Yazar *</label>
-                    <input type="text" id="bookAuthor" placeholder="Örn: Fyodor Dostoyevski">
-                </div>
-                <div class="form-group">
-                    <label>ISBN *</label>
-                    <input type="text" id="bookIsbn" placeholder="Örn: 978-975-08-1234-5">
-                </div>
-                <div class="form-group">
-                    <label>Yayın Yılı</label>
-                    <input type="number" id="bookYear" placeholder="Örn: 1866">
-                </div>
-                <div class="form-group">
-                    <label>Toplam Kopya *</label>
-                    <input type="number" id="bookTotal" placeholder="Örn: 5" value="5">
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="navbarNav" class="collapse navbar-collapse">
+
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="switchTab('books')">
+                        <i class="fas fa-book-open me-1"></i> Kitaplar
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('requests')">
+                        <i class="fas fa-paper-plane me-1"></i> İstekler
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('users')">
+                        <i class="fas fa-users me-1"></i> Kullanıcılar
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+
+                    <a class="nav-link dropdown-toggle" id="navbarDropdownAdmin" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-shield me-1"></i> Yönetici
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item"><i class="fas fa-cog me-1"></i> Ayarlar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Çıkış Yap
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- TABS -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs">
+        <li class="nav-item"><button class="nav-link active" id="books-tab" onclick="switchTab('books')">📚 Kitap Yönetimi</button></li>
+        <li class="nav-item"><button class="nav-link" id="users-tab" onclick="switchTab('users')">👥 Kullanıcı Yönetimi</button></li>
+        <li class="nav-item"><button class="nav-link" id="requests-tab" onclick="switchTab('requests')">📩 Ödünç İstekleri</button></li>
+        <li class="nav-item"><button class="nav-link" id="borrows-tab" onclick="switchTab('borrows')">📘 Ödünç Kayıtları</button></li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- BOOKS -->
+        <div id="books" class="tab-pane fade show active">
+
+            <!-- Kitap Ekle -->
+            <div class="card p-3 mb-4">
+                <h5 class="card-header">📌 Yeni Kitap Ekle</h5>
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-4"><label>Başlık *</label><input id="bookTitle" class="form-control"></div>
+                        <div class="col-md-4"><label>Yazar *</label><input id="bookAuthor" class="form-control"></div>
+                        <div class="col-md-4"><label>ISBN *</label><input id="bookIsbn" class="form-control"></div>
+
+                        <div class="col-md-4"><label>Yayın Yılı</label><input type="number" id="bookYear" class="form-control"></div>
+                        <div class="col-md-4"><label>Toplam Kopya *</label><input type="number" id="bookTotal" class="form-control" value="5"></div>
+
+                    </div>
+                    <button onclick="addBook()" class="btn btn-primary mt-3">➕ Kitap Ekle</button>
                 </div>
             </div>
-            <button onclick="addBook()">➕ Kitap Ekle</button>
-        </div>
 
-        <div class="section">
-            <h2>✏️ Kitap Güncelle</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Kitap ID *</label>
-                    <input type="number" id="updateBookId" placeholder="Güncellenecek kitap ID">
-                </div>
-                <div class="form-group">
-                    <label>Yeni Başlık *</label>
-                    <input type="text" id="updateTitle" placeholder="Yeni başlık">
-                </div>
-                <div class="form-group">
-                    <label>Yeni Yazar *</label>
-                    <input type="text" id="updateAuthor" placeholder="Yeni yazar">
-                </div>
-                <div class="form-group">
-                    <label>Yeni ISBN *</label>
-                    <input type="text" id="updateIsbn" placeholder="Yeni ISBN">
-                </div>
-                <div class="form-group">
-                    <label>Yayın Yılı</label>
-                    <input type="number" id="updateYear" placeholder="Yayın yılı">
-                </div>
-                <div class="form-group">
-                    <label>Toplam Kopya *</label>
-                    <input type="number" id="updateTotal" placeholder="Toplam kopya">
-                </div>
-                <div class="form-group">
-                    <label>Mevcut Kopya</label>
-                    <input type="number" id="updateAvailable" placeholder="Mevcut kopya">
+            <!-- Kitap Güncelle -->
+            <div class="card p-3 mb-4">
+                <h5 class="card-header">✏️ Kitap Güncelle</h5>
+
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-4"><label>ID</label><input id="updateBookId" class="form-control" type="number"></div>
+                        <div class="col-md-4"><label>Yeni Başlık</label><input id="updateTitle" class="form-control"></div>
+                        <div class="col-md-4"><label>Yeni Yazar</label><input id="updateAuthor" class="form-control"></div>
+
+                        <div class="col-md-4"><label>Yeni ISBN</label><input id="updateIsbn" class="form-control"></div>
+                        <div class="col-md-4"><label>Yayın Yılı</label><input id="updateYear" type="number" class="form-control"></div>
+                        <div class="col-md-4"><label>Toplam Kopya</label><input id="updateTotal" type="number" class="form-control"></div>
+
+                        <div class="col-md-4"><label>Mevcut Kopya</label><input id="updateAvailable" type="number" class="form-control"></div>
+
+                    </div>
+
+                    <button onclick="updateBook()" class="btn btn-secondary mt-3">🔄 Güncelle</button>
                 </div>
             </div>
-            <button onclick="updateBook()">✏️ Kitap Güncelle</button>
-        </div>
 
-        <div class="section">
-            <h2>🗑️ Kitap Sil</h2>
-            <div class="form-group" style="max-width: 300px;">
-                <label>Kitap ID</label>
-                <input type="number" id="deleteBookId" placeholder="Silinecek kitap ID">
-            </div>
-            <button class="danger" onclick="deleteBook()">🗑️ Kitap Sil</button>
-        </div>
+            <!-- Kitap Sil -->
+            <div class="card p-3 mb-4">
+                <h5 class="card-header text-white" style="background-color:#e57373!important;">🗑 Kitap Sil</h5>
 
-        <div class="section">
-            <h2>📋 Tüm Kitaplar</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;">
-                <div class="form-group" style="flex: 1; margin: 0;">
-                    <label>🔍 Kitap Ara</label>
-                    <input type="text" id="searchInput" placeholder="Kitap başlığı ile ara..." />
+                <div class="card-body">
+                    <div class="col-md-3">
+                        <label>Kitap ID *</label>
+                        <input id="deleteBookId" type="number" class="form-control">
+                    </div>
+
+                    <button onclick="deleteBook()" class="btn btn-danger mt-3">❌ Sil</button>
                 </div>
-                <button onclick="searchBooks()" class="success">🔍 Ara</button>
-                <button onclick="getAllBooks()" class="info">📚 Tümünü Göster</button>
             </div>
-            <div id="booksTable" class="table-container"></div>
+
+            <!-- Tüm Kitaplar -->
+            <div class="card p-3">
+                <h5 class="card-header">📚 Tüm Kitaplar</h5>
+
+                <div class="d-flex gap-2 p-3">
+                    <input id="searchInput" class="form-control" placeholder="Arama yap...">
+                    <button onclick="searchBooks()" class="btn btn-primary">Ara</button>
+                    <button onclick="getAllBooks()" class="btn btn-secondary">Tümünü Göster</button>
+                </div>
+
+                <div id="booksTable" class="p-3"></div>
+            </div>
+
         </div>
+
+        <!-- USERS -->
+        <div id="users" class="tab-pane fade">
+            <div class="card p-3">
+                <h5 class="card-header">👥 Tüm Kullanıcılar</h5>
+                <div class="p-3">
+                    <button onclick="getAllUsers()" class="btn btn-primary mb-3">Yenile</button>
+                    <div id="usersTable"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REQUESTS -->
+        <div id="requests" class="tab-pane fade">
+            <div class="card p-3 mb-4">
+                <h5 class="card-header" style="background-color:#f4d06f!important; color:#004b4b;">⏳ Bekleyen İstekler</h5>
+                <div class="p-3">
+                    <button onclick="getPendingRequests()" class="btn btn-secondary mb-3">Yenile</button>
+                    <div id="pendingRequestsTable"></div>
+                </div>
+            </div>
+
+            <div class="card p-3">
+                <h5 class="card-header">📄 Tüm İstekler</h5>
+                <div class="p-3">
+                    <button onclick="getAllRequests()" class="btn btn-secondary mb-3">Tümünü Göster</button>
+                    <div id="allRequestsTable"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BORROWS -->
+        <div id="borrows" class="tab-pane fade">
+            <div class="card p-3">
+                <h5 class="card-header text-white" style="background-color:#28c76f!important;">📘 Ödünç Kayıtları</h5>
+                <div class="p-3">
+                    <button onclick="getAllBorrows()" class="btn btn-success mb-3">Yenile</button>
+                    <div id="borrowsTable"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div id="users" class="tab-content">
-        <div class="section">
-            <h2>👥 Tüm Kullanıcılar</h2>
-            <button onclick="getAllUsers()" class="success">🔄 Yenile</button>
-            <div id="usersTable" class="table-container"></div>
-        </div>
-    </div>
+    <div id="alert" class="alert fixed-bottom m-3"></div>
 
-    <div id="requests" class="tab-content">
-        <div class="section">
-            <h2>📝 Bekleyen Ödünç İstekleri</h2>
-            <button onclick="getPendingRequests()" class="success">🔄 Yenile</button>
-            <div id="pendingRequestsTable" class="table-container"></div>
-        </div>
-        
-        <div class="section">
-            <h2>📋 Tüm Ödünç İstekleri</h2>
-            <button onclick="getAllRequests()" class="info">🔄 Tümünü Göster</button>
-            <div id="allRequestsTable" class="table-container"></div>
-        </div>
-    </div>
-
-    <div id="borrows" class="tab-content">
-        <div class="section">
-            <h2>📖 Tüm Ödünç Kayıtları</h2>
-            <button onclick="getAllBorrows()" class="success">🔄 Yenile</button>
-            <div id="borrowsTable" class="table-container"></div>
-        </div>
-    </div>
-
-    <div id="alert" class="alert"></div>
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/admin.js"></script>
+
+<script>
+    function switchTab(tabId) {
+        const el = document.getElementById(tabId + "-tab");
+        if (el) new bootstrap.Tab(el).show();
+    }
+
+    window.onload = () => getAllBooks();
+</script>
+
 </body>
 </html>
