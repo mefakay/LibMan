@@ -3,9 +3,11 @@ package com.library.libman.controller;
 import com.library.libman.entity.Book;
 import com.library.libman.entity.Borrow;
 import com.library.libman.entity.User;
+import com.library.libman.entity.BorrowRequest;
 import com.library.libman.service.BookService;
 import com.library.libman.service.BorrowService;
 import com.library.libman.service.UserService;
+import com.library.libman.service.BorrowRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BorrowRequestService requestService;
 
     // Ödünç alınabilir kitapları getirir
     @GetMapping("/books")
@@ -90,6 +95,31 @@ public class UserController {
         User user = userService.getUserByUsername(authentication.getName());
         List<Borrow> borrows = borrowService.getUserActiveBorrows(user.getId());
         return ResponseEntity.ok(borrows);
+    }
+
+    //
+    // Kitap ödünç isteği alır
+    @PostMapping("/borrow-request/{username}/{bookId}")
+    public ResponseEntity<?> requestBook(@PathVariable @NonNull String username, @PathVariable @NonNull Long bookId) {
+        try {
+            User user = userService.getUserByUsername(username);
+            BorrowRequest request = requestService.borrowRequestBook(user.getId(), bookId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(request);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    //Kullanıcının ödünç isteklerini getirir
+    @GetMapping("/{username}/borrow-requests")
+    public ResponseEntity<?> getUserRequestByUsername(@PathVariable @NonNull String username) {
+        try {
+            User user = userService.getUserByUsername(username);
+            List<BorrowRequest> request = requestService.getUserBorrowRequests(user.getId());
+            return ResponseEntity.ok(request);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     // Not: Eski /borrow/username/{username}/{bookId} gibi metodlar güvenlik nedeniyle kaldırıldı veya güncellendi.

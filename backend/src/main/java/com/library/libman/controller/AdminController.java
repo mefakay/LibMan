@@ -3,9 +3,11 @@ package com.library.libman.controller;
 import com.library.libman.entity.Book;
 import com.library.libman.entity.Borrow;
 import com.library.libman.entity.User;
+import com.library.libman.entity.BorrowRequest;
 import com.library.libman.service.BookService;
 import com.library.libman.service.BorrowService;
 import com.library.libman.service.UserService;
+import com.library.libman.service.BorrowRequestService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,9 @@ public class AdminController {
 
     @Autowired
     private BorrowService borrowService;
+
+    @Autowired
+    private BorrowRequestService requestService;
 
     // Tüm kitapları getirir
     @GetMapping("/books")
@@ -91,5 +96,36 @@ public class AdminController {
     public ResponseEntity<List<Borrow>> getAllBorrows() {
         List<Borrow> borrows = borrowService.getAllBorrows();
         return ResponseEntity.ok(borrows);
+    }
+
+    //
+    // Tüm ödünç isteklerini getirir
+    @GetMapping("/borrow-requests/pending")
+    public ResponseEntity<List<BorrowRequest>> getAllRequests() {
+        List<BorrowRequest> requests = requestService.getAllBorrowRequests();
+        return ResponseEntity.ok(requests);
+    }
+
+    // Kitap ödünç isteğini onaylar
+    @PostMapping("/borrow-requests/{requestId}/approve")
+    public ResponseEntity<?> approveBorrowRequest(@PathVariable Long requestId) {
+        try {
+            Borrow borrow = requestService.acceptRequest(requestId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(borrow);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    // Talebi reddeder
+    @PostMapping("/borrow-requests/{requestId}/reject")
+    public ResponseEntity<?> rejectBorrowRequest(
+            @PathVariable Long requestId) {
+        try {
+            BorrowRequest request = requestService.rejectRequest(requestId);
+            return ResponseEntity.ok(request);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }
