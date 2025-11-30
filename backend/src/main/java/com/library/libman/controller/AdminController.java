@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.prepost.PreAuthorize; // Yeni
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,24 +19,25 @@ import java.util.List;
 // Yönetici işlemleri için API endpoint'leri
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')") // Sınıf düzeyinde ADMIN yetkilendirmesi
 public class AdminController {
-    
+
     @Autowired
     private BookService bookService;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private BorrowService borrowService;
-    
+
     // Tüm kitapları getirir
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
-    
+
     // Yeni kitap ekler
     @PostMapping("/books")
     public ResponseEntity<?> addBook(@Valid @RequestBody Book book) {
@@ -46,7 +48,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    
+
     // Kitabı siler
     @DeleteMapping("/books/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable @NonNull Long id) {
@@ -57,7 +59,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-    
+
     // Kitap bilgilerini günceller
     @PutMapping("/books/{id}")
     public ResponseEntity<?> updateBook(@PathVariable @NonNull Long id, @Valid @RequestBody Book book) {
@@ -68,22 +70,22 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-    
+
     // ID'ye göre kitap getirir
     @GetMapping("/books/{id}")
     public ResponseEntity<?> getBookById(@PathVariable @NonNull Long id) {
         return bookService.getBookById(id)
-                .map(book -> ResponseEntity.ok(book))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     // Tüm kullanıcıları getirir
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
-    
+
     // Tüm ödünç kayıtlarını getirir
     @GetMapping("/borrows")
     public ResponseEntity<List<Borrow>> getAllBorrows() {
@@ -91,5 +93,3 @@ public class AdminController {
         return ResponseEntity.ok(borrows);
     }
 }
-
-

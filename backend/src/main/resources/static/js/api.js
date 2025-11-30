@@ -18,32 +18,13 @@ async function apiRequest(endpoint, options = {}) {
             ...options.headers
         }
     };
-    
+
     const config = { ...defaultOptions, ...options };
-    
+
     try {
         const response = await fetch(url, config);
-        
-        // Response body'yi önce text olarak oku
-        const text = await response.text();
-        
-        // Eğer body boşsa, null döndür
-        if (!text || text.trim() === '') {
-            if (!response.ok) {
-                throw new Error('Bir hata oluştu');
-            }
-            return null;
-        }
-        
-        // JSON'a parse etmeyi dene
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            // JSON değilse, text olarak kullan
-            data = text;
-        }
-        
+        const data = await response.json().catch(() => response.text());
+
         if (!response.ok) {
             // Validation hatalarını özel olarak handle et
             if (data && data.errors && typeof data.errors === 'object') {
@@ -54,7 +35,7 @@ async function apiRequest(endpoint, options = {}) {
             // Normal hata mesajı
             throw new Error(typeof data === 'string' ? data : (data.message || 'Bir hata oluştu'));
         }
-        
+
         return data;
     } catch (error) {
         throw error;
