@@ -27,7 +27,10 @@ public class DataInitializer implements CommandLineRunner {
             addTestBooks();
         }
 
-        if (userRepository.count() == 0) {
+        if (    (userRepository.findByUsername("duygu").isEmpty())&&
+                (userRepository.findByUsername("ahmet").isEmpty())&&
+                (userRepository.findByUsername("fatih").isEmpty())&&
+                (userRepository.findByUsername("kaan").isEmpty())) {
             addTestUsers();
         }
 
@@ -53,33 +56,41 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void addTestUsers() {
-        // ADMIN
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setPassword(passwordEncoder.encode("admin123")); // Şifrelenmiş
-        admin.setEmail("admin@library.com");
-        admin.setFullName("Yönetici Admin");
-        admin.setRole(User.UserRole.ADMIN);
-        userRepository.save(admin);
+        User admin1 = new User();
+        admin1.setUsername("ahmet");
+        admin1.setPassword(passwordEncoder.encode("ahmet123"));
+        admin1.setEmail("ahmet@library.com");
+        admin1.setFullName("Ahmet Taha ÖZCAN");
+        admin1.setRole(User.UserRole.ADMIN);
+        userRepository.save(admin1);
 
-        // USER 1
-        User user1 = new User();
-        user1.setUsername("ahmet");
-        user1.setPassword(passwordEncoder.encode("ahmet123")); // Şifrelenmiş
-        user1.setEmail("ahmet@example.com");
-        user1.setFullName("Ahmet Yılmaz");
-        user1.setRole(User.UserRole.USER);
-        userRepository.save(user1);
+        // --- ADMIN 2 ---
+        User admin2 = new User();
+        admin2.setUsername("duygu");
+        admin2.setPassword(passwordEncoder.encode("duygu123")); // Şifre: sifre2
+        admin2.setEmail("duygu@library.com");
+        admin2.setFullName("Duygu AKMAN");
+        admin2.setRole(User.UserRole.ADMIN);
+        userRepository.save(admin2);
 
-        // USER 2
-        User user2 = new User();
-        user2.setUsername("ayse");
-        user2.setPassword(passwordEncoder.encode("ayse123")); // Şifrelenmiş
-        user2.setEmail("ayse@example.com");
-        user2.setFullName("Ayşe Demir");
-        user2.setRole(User.UserRole.USER);
-        userRepository.save(user2);
+        // --- ADMIN 3 ---
+        User admin3 = new User();
+        admin3.setUsername("kaan");
+        admin3.setPassword(passwordEncoder.encode("kaan123")); // Şifre: sifre3
+        admin3.setEmail("kaan@library.com");
+        admin3.setFullName("Kaan BEHZETOĞLU");
+        admin3.setRole(User.UserRole.ADMIN);
+        userRepository.save(admin3);
 
-        System.out.println("👤 Test kullanıcıları eklendi (Şifreler şifrelendi)");
+        // --- ADMIN 4 ---
+        User admin4 = new User();
+        admin4.setUsername("fatih");
+        admin4.setPassword(passwordEncoder.encode("fatih123")); // Şifre: sifre4
+        admin4.setEmail("fatih@library.com");
+        admin4.setFullName("Mehmet Fatih AKAY");
+        admin4.setRole(User.UserRole.ADMIN);
+        userRepository.save(admin4);
+
+        System.out.println("✅ 4 Adet Admin kullanıcısı güvenli şifrelerle oluşturuldu.");
     }
 }
