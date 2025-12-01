@@ -173,6 +173,58 @@
     </div>
 </div>
 
+<div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border:none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary">✏️ Kitap Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-4">
+
+                <input type="hidden" id="editBookId">
+                <input type="hidden" id="editOldTotal">
+                <input type="hidden" id="editOldAvailable">
+
+                <div class="mb-3">
+                    <label class="form-label fw-600">Kitap Başlığı</label>
+                    <input type="text" id="editTitle" class="form-control">
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-600">Yazar</label>
+                        <input type="text" id="editAuthor" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-600">Yıl</label>
+                        <input type="number" id="editYear" class="form-control">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-600">ISBN</label>
+                    <input type="text" id="editIsbn" class="form-control">
+                </div>
+
+                <div class="p-3 bg-light rounded border">
+                    <label class="form-label fw-600 text-dark">📦 Toplam Stok Sayısı</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="number" id="editTotal" class="form-control fw-bold text-center" style="font-size: 1.2rem; color: var(--primary-color);">
+                        <small class="text-muted" style="width: 150px; line-height: 1.2; font-size: 11px;">
+                            Burayı arttırırsanız mevcut stok da artar.
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button onclick="saveBookUpdate()" class="btn btn-primary w-100">Değişiklikleri Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="adminToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
