@@ -1,360 +1,138 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>👤 Kullanıcı Paneli | Lib-Man</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lib-Man Dashboard</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <style>
-
-        /* ============================================
-           USER SAYFASI – SU YEŞİLİ MODERN TEMA
-        ============================================ */
-
-        /* ARKA PLAN: Açık su yeşili degrade */
-        body {
-            background: linear-gradient(135deg, #b2f7ef 0%, #5ccccc 100%);
-            padding: 20px;
-            font-family: 'Inter', sans-serif;
-            color: #003333;
-        }
-
-        .container {
-            background: none !important;
-        }
-
-        /* NAVBAR */
-        .navbar {
-            background-color: #0f7f7f !important;
-            border-bottom: 3px solid #1daaaa;
-        }
-
-        .navbar-brand {
-            color: #d9fffa !important;
-            font-weight: bold;
-        }
-
-        .nav-link {
-            color: #e6fffb !important;
-        }
-        .nav-link:hover {
-            color: #ffffff !important;
-        }
-        .nav-link.active {
-            color: #ffffff !important;
-            border-bottom: 2px solid #b2f7ef;
-        }
-
-        /* SEARCH INPUT */
-        .form-control {
-            background-color: #eafffa !important;
-            color: #004949 !important;
-            border: 1px solid #1daaaa;
-        }
-        .form-control:focus {
-            border-color: #0c7f7f;
-            box-shadow: 0 0 0 0.25rem rgba(0,150,150,0.15);
-        }
-
-        /* BUTTONLAR */
-        .btn-primary {
-            background: linear-gradient(135deg, #1daaaa 0%, #0c7f7f 100%);
-            border-color: #1daaaa;
-            color: white !important;
-        }
-        .btn-primary:hover {
-            box-shadow: 0 6px 20px rgba(0, 100, 100, 0.35);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background-color: #1daaaa;
-            border-color: #1daaaa;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background-color: #0c7f7f;
-        }
-
-        .btn-success {
-            background-color: #2ecc71;
-            border-color: #2ecc71;
-        }
-
-        .btn-warning {
-            background-color: #f1c40f;
-            border-color: #f1c40f;
-            color: #003333 !important;
-        }
-
-        .btn-danger {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-
-        /* KARTLAR */
-        .card {
-            background-color: #e6fffb;
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid #9fffea;
-            box-shadow: 0 4px 12px rgba(0, 70, 70, 0.12);
-        }
-
-        .card-header {
-            background-color: #1daaaa !important;
-            color: white;
-            border-bottom: 1px solid #128888;
-            font-weight: bold;
-        }
-
-        .card-title {
-            color: #0e5f5f;
-        }
-
-        /* TABLE */
-        .table-container {
-            color: #003f3f;
-        }
-
-        thead {
-            background: linear-gradient(135deg, #1daaaa 0%, #0c7f7f 100%);
-            color: white;
-        }
-
-        /* Kullanıcı bilgisi kutusu */
-        .current-user {
-            background: #d5fffa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #1daaaa;
-        }
-
-        .current-user strong {
-            color: #0c7f7f;
-        }
-
-        /* Input & Select */
-        input, select {
-            border: 2px solid #1daaaa !important;
-            background: white !important;
-            color: #005050 !important;
-        }
-
-        input:focus, select:focus {
-            border-color: #0c7f7f !important;
-            box-shadow: 0 0 0 3px rgba(0,150,150,0.15) !important;
-        }
-
-    </style>
-
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/user.css">
 </head>
-
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark shadow-lg">
-    <div class="container-fluid container">
-        <a class="navbar-brand fw-bold">
-            <i class="fas fa-book-reader me-2"></i> Lib-Man
-        </a>
+<aside class="sidebar">
+    <div class="brand-logo">
+        <i class="fas fa-book-reader"></i> Lib-Man
+    </div>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <div class="user-box">
+        <img src="https://ui-avatars.com/api/?name=User&background=00b894&color=fff" class="user-avatar" alt="User">
+        <div style="line-height: 1.2;">
+            <div style="font-weight: 600; font-size: 14px;" th:text="${username}">Kullanıcı</div>
+            <div style="font-size: 11px; color: #888;">Öğrenci</div>
+        </div>
+    </div>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-
-            <div class="d-flex mx-auto w-50 my-2 my-lg-0">
-                <input class="form-control me-2" type="search" placeholder="Kitap ara..." id="navSearchInput">
-                <button class="btn btn-primary" onclick="searchBooks(document.getElementById('navSearchInput').value)">
-                    <i class="fas fa-search"></i>
+    <ul class="nav-menu">
+        <li>
+            <a href="#" class="active" onclick="showSection('catalog')">
+                <i class="fas fa-th-large"></i> Ana Panel
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="showSection('mybooks')">
+                <i class="fas fa-book"></i> Kitaplarım
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="showSection('requests')">
+                <i class="fas fa-clock"></i> İstekler
+            </a>
+        </li>
+        <li style="margin-top: 30px;">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-link text-decoration-none text-danger ps-3">
+                    <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
                 </button>
-            </div>
+            </form>
+        </li>
+    </ul>
+</aside>
 
-            <ul class="navbar-nav">
+<main class="main-content">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-home me-1"></i> Anasayfa</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#booksTable"><i class="fas fa-list me-1"></i> Kataloğum</a>
-                </li>
-
-                <li class="nav-item dropdown ms-lg-3">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i> <span th:text="${username}">Kullanıcı</span>
-                    </a>
-
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item"><i class="fas fa-id-card me-1"></i> Profilim</a></li>
-                        <li><a class="dropdown-item"><i class="fas fa-cog me-1"></i> Ayarlar</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form th:action="@{/logout}" method="post" class="m-0">
-                                <button class="dropdown-item text-danger">
-                                    <i class="fas fa-sign-out-alt me-1"></i> Çıkış Yap
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-
-                </li>
-            </ul>
-
+    <div class="header-section">
+        <div>
+            <h2 style="font-weight: 700; margin-bottom: 5px;">Hoşgeldin! 👋</h2>
+            <p class="text-muted">Bugün kütüphanede neler keşfetmek istersin?</p>
         </div>
-    </div>
-</nav>
-
-<div class="container mt-4">
-
-    <!-- === Hoş geldiniz kartı === -->
-    <div class="card shadow-lg mb-4">
-        <div class="card-body p-4">
-            <h4 class="card-title mb-3">
-                <i class="fas fa-hand-peace me-2" style="color:#f1c40f;"></i>
-                Hoş Geldiniz, <span th:text="${username}" class="fw-bold" style="color:#0f7f7f;">Kullanıcı</span>
-            </h4>
-
-            <div class="row align-items-center">
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Kullanıcı Adınız:</label>
-                    <input id="selectedUsername" th:value="${username}" readonly class="form-control border-0">
-                </div>
-
-                <div class="col-md-3 d-flex">
-                    <button onclick="loadUserData()" class="btn btn-primary btn-sm shadow-sm w-100 mt-3">
-                        Verilerimi Getir
-                    </button>
-                </div>
-
-            </div>
-
-            <div id="currentUserInfo" class="current-user" style="display:none;">
-                <strong><i class="fas fa-check-circle me-1"></i> Aktif Kullanıcı:</strong>
-                <span id="currentUsername"></span>
-            </div>
-
+        <div class="search-wrapper">
+            <i class="fas fa-search text-muted"></i>
+            <input type="text" id="searchInput" placeholder="Kitap ara...">
         </div>
     </div>
 
-    <!-- === Borrow + Return işlemleri === -->
-    <div class="row g-4 mb-4">
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon-bg bg-teal"><i class="fas fa-swatchbook"></i></div>
+            <div class="stat-number" id="totalBooksCount">0</div>
+            <div class="stat-label">Toplam Kitap</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-bg bg-orange"><i class="fas fa-book-reader"></i></div>
+            <div class="stat-number" id="activeBorrowsCount">0</div>
+            <div class="stat-label">Okuduklarım</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-bg bg-blue"><i class="fas fa-hourglass-half"></i></div>
+            <div class="stat-number" id="pendingRequestsCount">0</div>
+            <div class="stat-label">Bekleyen İstek</div>
+        </div>
+    </div>
 
-        <!-- Ödünç isteği -->
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-3">
-                        <i class="fas fa-paper-plane me-2" style="color:#1daaaa;"></i> Kitap Ödünç İsteği Gönder
-                    </h5>
+    <div class="content-grid">
 
-                    <label class="form-label">Kitap ID *</label>
-                    <input id="requestBookId" type="number" class="form-control">
+        <div class="content-card">
+            <div class="card-header-flex">
+                <h4 style="font-weight: 600;">📚 Kitap Kataloğu</h4>
+                <button class="btn btn-sm btn-light" onclick="loadBooks()">Yenile</button>
+            </div>
 
-                    <button onclick="sendBorrowRequest()" class="btn btn-success w-100 mt-3">
-                        <i class="fas fa-check me-1"></i> Gönder
-                    </button>
-                </div>
+            <div id="bookListContainer">
+                <div class="text-center py-4"><div class="spinner-border text-success"></div></div>
             </div>
         </div>
 
-        <!-- İade -->
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-3">
-                        <i class="fas fa-undo me-2" style="color:#f1c40f;"></i> Kitap İade Et
-                    </h5>
+        <div class="content-card">
+            <div class="card-header-flex">
+                <h5 style="font-weight: 600;">Hızlı İşlemler</h5>
+            </div>
 
-                    <label class="form-label">Ödünç ID *</label>
-                    <input id="returnBookId" type="number" class="form-control">
-
-                    <button onclick="returnBook()" class="btn btn-warning w-100 mt-3">
-                        <i class="fas fa-reply me-1"></i> İade Et
-                    </button>
+            <div class="p-3 bg-light rounded mb-3">
+                <h6 class="mb-2" style="font-size: 13px; font-weight: 600;">İade Et</h6>
+                <div class="input-group">
+                    <input type="number" id="returnIdInput" class="form-control form-control-sm border-0" placeholder="Ödünç ID">
+                    <button class="btn btn-success btn-sm" onclick="returnBook()"><i class="fas fa-check"></i></button>
                 </div>
+            </div>
+
+            <h6 style="font-size: 13px; font-weight: 600; margin-top: 20px;">Son Hareketler</h6>
+            <div id="recentActivity" class="mt-3">
+                <small class="text-muted d-block text-center">Henüz işlem yok.</small>
             </div>
         </div>
 
     </div>
 
-    <!-- === Kullanıcının istekleri & ödünç kayıtları === -->
-    <div class="row g-4">
+</main>
 
-        <!-- İsteklerim -->
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header">📩 Ödünç İsteklerim</div>
-                <div class="card-body">
-                    <button onclick="getMyBorrowRequests()" class="btn btn-secondary btn-sm mb-2">Yenile</button>
-                    <div id="requestsTable" class="table-container"></div>
-                </div>
-            </div>
+<input type="hidden" id="currentUsername" th:value="${username}">
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="toastTitle">Lib-Man</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
         </div>
-
-        <!-- Ödünç kayıtlarım -->
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header">📘 Ödünç Kayıtlarım</div>
-                <div class="card-body">
-                    <button onclick="getUserBorrows()" class="btn btn-secondary btn-sm mb-2">Yenile</button>
-                    <div id="borrowsTable" class="table-container"></div>
-                </div>
-            </div>
-        </div>
-
+        <div class="toast-body" id="toastMessage">...</div>
     </div>
-
-    <!-- === Katalog === -->
-    <div class="card shadow-lg mt-4 mb-5">
-        <div class="card-header">
-            <h5 class="mb-0" style="color:#0f7f7f;">
-                <i class="fas fa-search me-2"></i> KÜTÜPHANE KATALOĞU
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            <button onclick="getAllBooks()" class="btn btn-secondary mb-3">📚 Tümünü Göster</button>
-
-            <div id="booksTable" class="row g-3"></div>
-
-        </div>
-    </div>
-
-    <div id="alert" class="alert fixed-bottom m-3"></div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/user.js"></script>
-
-<script>
-    window.onload = function () {
-        getAllBooks();
-        setTimeout(() => {
-            loadUserData();
-            getMyBorrowRequests();
-        }, 500);
-
-        const searchInput = document.getElementById("navSearchInput");
-
-        if (searchInput) {
-            searchInput.addEventListener("keypress", function (e) {
-                if (e.key === "Enter") {
-                    searchBooks(searchInput.value);
-                }
-            });
-        }
-    };
-</script>
-
 </body>
 </html>

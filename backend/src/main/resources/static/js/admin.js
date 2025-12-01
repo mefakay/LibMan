@@ -1,70 +1,102 @@
-/* ============================================
-   ADMIN SAYFASI JAVASCRIPT
-   ============================================ */
+/* resources/static/js/admin.js */
 
-// Tab yönetimi
-function switchTab(tabName) {
-    // Tüm tab'ları gizle
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Tüm tab butonlarını pasif yap
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Seçilen tab'ı göster
-    document.getElementById(tabName).classList.add('active');
-    event.target.classList.add('active');
+document.addEventListener("DOMContentLoaded", function() {
+    loadStats(); // İstatistikleri yükle
+    loadBooks(); // Varsayılan olarak kitapları da yükleyelim
+});
+
+// GÖRÜNÜM DEĞİŞTİRME
+/* --- MENÜ GEÇİŞ FONKSİYONU --- */
+function showView(viewName) {
+    // 1. Tüm menü linklerinden 'active' sınıfını temizle
+    document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
+
+    // 2. Tıklanan linke 'active' sınıfını ekle
+    event.target.closest('a').classList.add('active');
+
+    // 3. Tüm Sayfa Bölümlerini (View) Gizle
+    document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+
+    // 4. Seçilen Bölümü Göster
+    const targetView = document.getElementById('view-' + viewName);
+    if (targetView) {
+        targetView.style.display = 'block';
+    }
+
+    // 5. Verileri Tazele (Opsiyonel: Her tıklamada veri yenilensin istersen)
+    if(viewName === 'books') loadBooks();
+    if(viewName === 'requests') loadRequests();
+    if(viewName === 'users') loadUsers();
 }
 
-// Alert göster (Toast notification kullanıyor)
-function showAlert(message, isError = false) {
-    const type = isError ? 'error' : 'success';
-    showToast(message, type);
-}
-
-// ============================================
-// KİTAP İŞLEMLERİ
-// ============================================
-
-async function getAllBooks() {
+// 1. İSTATİSTİKLERİ YÜKLE
+async function loadStats() {
     try {
-        const data = await apiGet('/admin/books');
-        displayBooksTable(data);
-    } catch (error) {
-        showAlert('Kitaplar yüklenirken hata oluştu: ' + error.message, true);
-    }
+        const [books, users, requests, borrows] = await Promise.all([
+            apiGet('/admin/books'),
+            apiGet('/admin/users'),
+            apiGet('/admin/borrow-requests/pending'),
+            apiGet('/admin/borrows')
+        ]);
+
+        document.getElementById('countBooks').innerText = books.length;
+        document.getElementById('countUsers').innerText = users.length;
+        document.getElementById('countRequests').innerText = requests.length;
+        document.getElementById('countBorrows').innerText = borrows.filter(b => b.status === 'ACTIVE').length;
+
+        // Rozet Güncelle
+        const badge = document.getElementById('badgeRequests');
+        if(requests.length > 0) {
+            badge.style.display = 'inline-block';
+            badge.innerText = requests.length;
+        } else {
+            badge.style.display = 'none';
+        }
+
+    } catch (e) { console.error(e); }
 }
 
-function displayBooksTable(books) {
-    const container = document.getElementById('booksTable');
-    if (!books || books.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Henüz kitap eklenmemiş.</p>';
-        return;
-    }
-    
-    let html = '<table><thead><tr><th>ID</th><th>Başlık</th><th>Yazar</th><th>ISBN</th><th>Yıl</th><th>Toplam</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody>';
-    
-    books.forEach(book => {
-        const available = book.availableCopies > 0;
-        html += `
-            <tr>
-                <td>${book.id}</td>
-                <td><strong>${book.title}</strong></td>
-                <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.publicationYear || '-'}</td>
-                <td>${book.totalCopies}</td>
-                <td>${book.availableCopies}</td>
-                <td><span class="badge ${available ? 'available' : 'unavailable'}">${available ? 'Mevcut' : 'Tükendi'}</span></td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
+// 2. KİTAPLARI LİSTELE
+async function loadBooks() {
+    const container = document.getElementById('booksListContainer');
+    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-success"></div></div>';
+
+    try {
+        const books = await apiGet('/admin/books');
+
+        if(books.length === 0) {
+            container.innerHTML = '<div class="text-muted text-center">Kitap yok.</div>';
+            return;
+        }
+
+        let html = '';
+        books.forEach(book => {
+            html += `
+            <div class="custom-list-item">
+                <div class="item-left">
+                    <div class="item-icon" style="background:#e0f2f1; color:#009688;">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0 fw-bold">${book.title}</h6>
+                        <span class="text-muted" style="font-size:12px;">${book.author} • Stok: ${book.availableCopies}/${book.totalCopies}</span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="deleteBook(${book.id})" class="btn btn-sm btn-light text-danger" title="Sil">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch (e) { container.innerHTML = 'Hata oluştu.'; }
+}
+
+// 3. KİTAP EKLE
+function toggleAddBookForm() {
+    const form = document.getElementById('addBookFormContainer');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 
 async function addBook() {
@@ -72,382 +104,124 @@ async function addBook() {
         title: document.getElementById('bookTitle').value,
         author: document.getElementById('bookAuthor').value,
         isbn: document.getElementById('bookIsbn').value,
-        publicationYear: parseInt(document.getElementById('bookYear').value) || null,
-        totalCopies: parseInt(document.getElementById('bookTotal').value) || 1,
-        availableCopies: parseInt(document.getElementById('bookTotal').value) || 1
+        publicationYear: parseInt(document.getElementById('bookYear').value) || 2024,
+        totalCopies: parseInt(document.getElementById('bookTotal').value) || 5,
+        availableCopies: parseInt(document.getElementById('bookTotal').value) || 5
     };
-    
-    if (!book.title || !book.author || !book.isbn) {
-        showAlert('Lütfen tüm zorunlu alanları doldurun!', true);
-        return;
-    }
-    
+
     try {
-        const data = await apiPost('/admin/books', book);
-        showAlert('Kitap başarıyla eklendi!');
+        await apiPost('/admin/books', book);
+        showToast('Başarılı', 'Kitap eklendi!');
+
+        // Formu temizle ve listeyi yenile
         document.getElementById('bookTitle').value = '';
-        document.getElementById('bookAuthor').value = '';
         document.getElementById('bookIsbn').value = '';
-        document.getElementById('bookYear').value = '';
-        document.getElementById('bookTotal').value = '5';
-        getAllBooks();
-    } catch (error) {
-        showAlert('Hata: ' + error.message, true);
-    }
+        loadBooks();
+        loadStats();
+    } catch(e) { showToast('Hata', e.message); }
 }
 
-async function updateBook() {
-    const bookId = document.getElementById('updateBookId').value;
-    const book = {
-        title: document.getElementById('updateTitle').value,
-        author: document.getElementById('updateAuthor').value,
-        isbn: document.getElementById('updateIsbn').value,
-        publicationYear: parseInt(document.getElementById('updateYear').value) || null,
-        totalCopies: parseInt(document.getElementById('updateTotal').value) || null,
-        availableCopies: parseInt(document.getElementById('updateAvailable').value) || null
-    };
-    
-    if (!bookId || !book.title || !book.author || !book.isbn || !book.totalCopies) {
-        showAlert('Lütfen tüm zorunlu alanları doldurun!', true);
-        return;
-    }
-    
+// 4. KİTAP SİL
+async function deleteBook(id) {
+    if(!confirm('Bu kitabı silmek istediğinize emin misiniz?')) return;
     try {
-        const data = await apiPut(`/admin/books/${bookId}`, book);
-        showAlert('Kitap başarıyla güncellendi!');
-        document.getElementById('updateBookId').value = '';
-        document.getElementById('updateTitle').value = '';
-        document.getElementById('updateAuthor').value = '';
-        document.getElementById('updateIsbn').value = '';
-        document.getElementById('updateYear').value = '';
-        document.getElementById('updateTotal').value = '';
-        document.getElementById('updateAvailable').value = '';
-        getAllBooks();
-    } catch (error) {
-        showAlert('Hata: ' + error.message, true);
-    }
+        await apiDelete(`/admin/books/${id}`);
+        showToast('Bilgi', 'Kitap silindi.');
+        loadBooks();
+        loadStats();
+    } catch(e) { showToast('Hata', e.message); }
 }
 
-async function deleteBook() {
-    const bookId = document.getElementById('deleteBookId').value;
-    if (!bookId) {
-        showAlert('Lütfen kitap ID girin!', true);
-        return;
-    }
-    
-    if (!confirm('Bu kitabı silmek istediğinizden emin misiniz?')) {
-        return;
-    }
-    
+// 5. İSTEKLERİ LİSTELE & YÖNET
+async function loadRequests() {
+    const container = document.getElementById('requestsListContainer');
+    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-danger"></div></div>';
+
     try {
-        await apiDelete(`/admin/books/${bookId}`);
-        showAlert('Kitap başarıyla silindi!');
-        document.getElementById('deleteBookId').value = '';
-        getAllBooks();
-    } catch (error) {
-        showAlert('Hata: ' + error.message, true);
-    }
-}
+        // Backend'den sadece PENDING olanları alacağız (filtreleme backend'de veya burada)
+        const requests = await apiGet('/admin/borrow-requests/pending'); // Endpoint'in doğru olduğundan emin ol
+        const pending = requests.filter(r => r.status === 'PENDING');
 
-// ============================================
-// KULLANICI İŞLEMLERİ
-// ============================================
-
-async function getAllUsers() {
-    try {
-        const data = await apiGet('/admin/users');
-        displayUsersTable(data);
-    } catch (error) {
-        showAlert('Kullanıcılar yüklenirken hata oluştu: ' + error.message, true);
-    }
-}
-
-function displayUsersTable(users) {
-    const container = document.getElementById('usersTable');
-    if (!users || users.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Henüz kullanıcı eklenmemiş.</p>';
-        return;
-    }
-    
-    let html = '<table><thead><tr><th>ID</th><th>Kullanıcı Adı</th><th>Ad Soyad</th><th>Email</th><th>Rol</th></tr></thead><tbody>';
-    
-    users.forEach(user => {
-        html += `
-            <tr>
-                <td>${user.id}</td>
-                <td><strong>${user.username}</strong></td>
-                <td>${user.fullName}</td>
-                <td>${user.email}</td>
-                <td><span class="badge ${user.role}">${user.role}</span></td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
-
-// ============================================
-// ÖDÜNÇ İSTEKLERİ YÖNETİMİ
-// ============================================
-
-// Bekleyen istekleri getir
-async function getPendingRequests() {
-    try {
-        const data = await apiGet('/admin/borrow-requests/pending');
-        // Sadece PENDING olanları filtrele
-        const pendingRequests = data.filter(r => r.status === 'PENDING');
-        displayPendingRequestsTable(pendingRequests);
-    } catch (error) {
-        showAlert('Bekleyen istekler yüklenirken hata oluştu: ' + error.message, true);
-    }
-}
-
-// Tüm istekleri getir
-async function getAllRequests() {
-    try {
-        const data = await apiGet('/admin/borrow-requests/pending');
-        displayAllRequestsTable(data);
-    } catch (error) {
-        showAlert('İstekler yüklenirken hata oluştu: ' + error.message, true);
-    }
-}
-
-// Bekleyen istekleri tabloda göster (Onayla/Reddet butonlarıyla)
-function displayPendingRequestsTable(requests) {
-    const container = document.getElementById('pendingRequestsTable');
-    if (!container) return;
-    
-    if (!requests || requests.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Bekleyen ödünç isteği yok.</p>';
-        return;
-    }
-    
-    let html = '<table><thead><tr><th>ID</th><th>Kullanıcı</th><th>Kitap</th><th>İstek Tarihi</th><th>İşlemler</th></tr></thead><tbody>';
-    
-    requests.forEach(request => {
-        html += `
-            <tr>
-                <td>${request.id}</td>
-                <td><strong>${request.user.username}</strong><br><small>${request.user.fullName}</small></td>
-                <td><strong>${request.book.title}</strong><br><small>${request.book.author}</small></td>
-                <td>${request.requestDate}</td>
-                <td>
-                    <button class="success" onclick="approveRequest(${request.id})" style="margin-right: 5px; padding: 5px 10px; font-size: 12px;">✅ Onayla</button>
-                    <button class="danger" onclick="rejectRequest(${request.id})" style="padding: 5px 10px; font-size: 12px;">❌ Reddet</button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
-
-// Tüm istekleri tabloda göster
-function displayAllRequestsTable(requests) {
-    const container = document.getElementById('allRequestsTable');
-    if (!container) return;
-    
-    if (!requests || requests.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Henüz ödünç isteği yok.</p>';
-        return;
-    }
-    
-    let html = '<table><thead><tr><th>ID</th><th>Kullanıcı</th><th>Kitap</th><th>İstek Tarihi</th><th>İşlem Tarihi</th><th>Durum</th></tr></thead><tbody>';
-    
-    requests.forEach(request => {
-        let statusClass = '';
-        let statusText = '';
-        
-        switch(request.status) {
-            case 'PENDING':
-                statusClass = 'pending';
-                statusText = '⏳ Beklemede';
-                break;
-            case 'APPROVED':
-                statusClass = 'available';
-                statusText = '✅ Onaylandı';
-                break;
-            case 'REJECTED':
-                statusClass = 'unavailable';
-                statusText = '❌ Reddedildi';
-                break;
-            default:
-                statusClass = '';
-                statusText = request.status;
+        if(pending.length === 0) {
+            container.innerHTML = '<div class="text-muted text-center">Bekleyen istek yok.</div>';
+            return;
         }
-        
-        html += `
-            <tr>
-                <td>${request.id}</td>
-                <td><strong>${request.user.username}</strong><br><small>${request.user.fullName}</small></td>
-                <td><strong>${request.book.title}</strong><br><small>${request.book.author}</small></td>
-                <td>${request.requestDate}</td>
-                <td>${request.processedDate || '-'}</td>
-                <td><span class="badge ${statusClass}">${statusText}</span></td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
 
-// İsteği onayla
-async function approveRequest(requestId) {
-    if (!confirm('Bu ödünç isteğini onaylamak istediğinizden emin misiniz?')) {
-        return;
-    }
-    
-    try {
-        await apiPost(`/admin/borrow-requests/${requestId}/approve`, {});
-        showAlert('Ödünç isteği onaylandı! Kitap kullanıcıya verildi.');
-        getPendingRequests();
-        getAllRequests();
-        getAllBooks(); // Kitap listesini güncelle
-    } catch (error) {
-        showAlert('Hata: ' + error.message, true);
-    }
-}
-
-// İsteği reddet
-async function rejectRequest(requestId) {
-    if (!confirm('Bu ödünç isteğini reddetmek istediğinizden emin misiniz?')) {
-        return;
-    }
-    
-    try {
-        await apiPost(`/admin/borrow-requests/${requestId}/reject`, {});
-        showAlert('Ödünç isteği reddedildi.');
-        getPendingRequests();
-        getAllRequests();
-        getAllBooks(); // Kitap listesini güncelle
-    } catch (error) {
-        showAlert('Hata: ' + error.message, true);
-    }
-}
-
-// ============================================
-// ÖDÜNÇ KAYITLARI
-// ============================================
-
-async function getAllBorrows() {
-    try {
-        const data = await apiGet('/admin/borrows');
-        displayBorrowsTable(data);
-    } catch (error) {
-        showAlert('Ödünç kayıtları yüklenirken hata oluştu: ' + error.message, true);
-    }
-}
-
-function displayBorrowsTable(borrows) {
-    const container = document.getElementById('borrowsTable');
-    if (!borrows || borrows.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">Henüz ödünç kaydı yok.</p>';
-        return;
-    }
-    
-    let html = '<table><thead><tr><th>ID</th><th>Kullanıcı</th><th>Kitap</th><th>Ödünç Tarihi</th><th>İade Tarihi</th><th>Durum</th></tr></thead><tbody>';
-    
-    borrows.forEach(borrow => {
-        html += `
-            <tr>
-                <td>${borrow.id}</td>
-                <td><strong>${borrow.user.username}</strong><br><small>${borrow.user.fullName}</small></td>
-                <td><strong>${borrow.book.title}</strong><br><small>${borrow.book.author}</small></td>
-                <td>${borrow.borrowDate}</td>
-                <td>${borrow.returnDate || '-'}</td>
-                <td><span class="badge ${borrow.status}">${borrow.status === 'ACTIVE' ? 'Aktif' : 'İade Edildi'}</span></td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
-
-// ============================================
-// KİTAP ARAMA FONKSİYONLARI
-// ============================================
-
-// Kitap ara
-async function searchBooks() {
-    const keyword = document.getElementById('searchInput').value.trim();
-    
-    if (!keyword) {
-        showAlert('Lütfen arama terimi girin!', true);
-        return;
-    }
-    
-    try {
-        // URL'deki özel karakterleri encode et
-        const encodedKeyword = encodeURIComponent(keyword);
-        // Admin için user endpoint'ini kullanabiliriz (her ikisi de aynı servisi kullanıyor)
-        const data = await apiGet(`/user/books/title/${encodedKeyword}`);
-        displaySearchResults(data, keyword);
-    } catch (error) {
-        showAlert('Arama sırasında hata oluştu: ' + error.message, true);
-    }
-}
-
-// Arama sonuçlarını göster (booksTable'a yazıyor)
-function displaySearchResults(books, keyword) {
-    const container = document.getElementById('booksTable');
-    
-    if (!books || books.length === 0) {
-        container.innerHTML = `<p style="padding: 20px; text-align: center; color: #666;">"${keyword}" için sonuç bulunamadı.</p>`;
-        return;
-    }
-    
-    let html = `<p style="padding: 10px; color: #666; font-weight: 600;">"${keyword}" için ${books.length} sonuç bulundu:</p>`;
-    html += '<table><thead><tr><th>ID</th><th>Başlık</th><th>Yazar</th><th>ISBN</th><th>Yıl</th><th>Toplam</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody>';
-    
-    books.forEach(book => {
-        const available = book.availableCopies > 0;
-        html += `
-            <tr>
-                <td>${book.id}</td>
-                <td><strong>${book.title}</strong></td>
-                <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.publicationYear || '-'}</td>
-                <td>${book.totalCopies}</td>
-                <td>${book.availableCopies}</td>
-                <td><span class="badge ${available ? 'available' : 'unavailable'}">${available ? 'Mevcut' : 'Tükendi'}</span></td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
-
-// Sayfa yüklendiğinde kitapları ve bekleyen istekleri getir
-window.onload = function() {
-    getAllBooks();
-    // Bekleyen istekleri de yükle (arka planda)
-    setTimeout(getPendingRequests, 500);
-    
-    // Enter tuşu ile arama yapma
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchBooks();
-            }
+        let html = '';
+        pending.forEach(req => {
+            html += `
+            <div class="custom-list-item">
+                <div class="item-left">
+                    <div class="item-icon" style="background:#ffebee; color:#e53935;">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0 fw-bold">${req.user.fullName} (@${req.user.username})</h6>
+                        <span class="text-muted" style="font-size:12px;">İstediği: <strong>${req.book.title}</strong> • Tarih: ${req.requestDate}</span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="approveRequest(${req.id})" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Onayla</button>
+                    <button onclick="rejectRequest(${req.id})" class="btn btn-outline-danger btn-sm"><i class="fas fa-times"></i> Reddet</button>
+                </div>
+            </div>`;
         });
-    }
-    
-    // Tümünü Göster butonuna tıklanınca arama input'unu temizle
-    const showAllBtn = document.querySelector('button[onclick="getAllBooks()"]');
-    if (showAllBtn) {
-        showAllBtn.addEventListener('click', function() {
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.value = '';
-            }
-        });
-    }
-};
+        container.innerHTML = html;
 
+    } catch(e) { container.innerHTML = 'Hata oluştu.'; }
+}
+
+async function approveRequest(id) {
+    try {
+        await apiPost(`/admin/borrow-requests/${id}/approve`, {});
+        showToast('Başarılı', 'İstek onaylandı, kitap verildi.');
+        loadRequests();
+        loadStats();
+    } catch(e) { showToast('Hata', e.message); }
+}
+
+async function rejectRequest(id) {
+    if(!confirm('Reddetmek istediğinize emin misiniz?')) return;
+    try {
+        await apiPost(`/admin/borrow-requests/${id}/reject`, {});
+        showToast('Bilgi', 'İstek reddedildi.');
+        loadRequests();
+        loadStats();
+    } catch(e) { showToast('Hata', e.message); }
+}
+
+// 6. KULLANICILARI LİSTELE
+async function loadUsers() {
+    const container = document.getElementById('usersListContainer');
+    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
+
+    try {
+        const users = await apiGet('/admin/users');
+
+        let html = '';
+        users.forEach(u => {
+            html += `
+            <div class="custom-list-item">
+                <div class="item-left">
+                    <div class="item-icon" style="background:#e3f2fd; color:#1565c0;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0 fw-bold">${u.fullName}</h6>
+                        <span class="text-muted" style="font-size:12px;">@${u.username} • ${u.email}</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge ${u.role === 'ADMIN' ? 'bg-danger' : 'bg-primary'}">${u.role}</span>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch(e) { container.innerHTML = 'Hata.'; }
+}
+
+function showToast(title, msg) {
+    document.getElementById('toastTitle').innerText = title;
+    document.getElementById('toastMessage').innerText = msg;
+    new bootstrap.Toast(document.getElementById('adminToast')).show();
+}

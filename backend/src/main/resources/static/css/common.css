@@ -1,376 +1,48 @@
-/* ============================================
-   ORTAK STİLLER - Tüm Sayfalar İçin
-   ============================================ */
+/* resources/static/css/common.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root {
+    /* Talib Edu Tasarım Renkleri */
+    --primary-color: #00b894; /* Teal/Yeşil */
+    --primary-light: #e6f7f4;
+    --text-dark: #2d3436;
+    --text-gray: #636e72;
+    --bg-body: #fbfbfb;
+    --bg-white: #ffffff;
+    --sidebar-width: 260px;
+    --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.04);
+    --border-radius: 16px;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-}
-
-/* Container */
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-
-/* Header */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 3px solid #667eea;
-}
-
-h1 {
-    color: #333;
-    font-size: 2.5em;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Buttons */
-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    transition: all 0.3s;
-    margin-right: 10px;
-    margin-top: 10px;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-button.danger {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-}
-
-button.success {
-    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-}
-
-button.info {
-    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-}
-
-/* Back Button */
-.back-btn {
-    padding: 10px 20px;
-    background: #667eea;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.back-btn:hover {
-    background: #5568d3;
-    transform: translateY(-2px);
-}
-
-/* Form Elements */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #555;
-    font-weight: 600;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s;
-}
-
-input:focus, select:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Section */
-.section {
-    margin-bottom: 40px;
-    padding: 25px;
-    background: #f8f9fa;
-    border-radius: 15px;
-    border-left: 5px solid #667eea;
-}
-
-.section h2 {
-    color: #667eea;
-    margin-bottom: 20px;
-    font-size: 1.5em;
-}
-
-/* Table */
-.table-container {
-    overflow-x: auto;
-    margin-top: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-th {
-    padding: 15px;
-    text-align: left;
-    font-weight: 600;
-}
-
-td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-tr:hover {
-    background: #f8f9fa;
-}
-
-/* Badges */
-.badge {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.85em;
-    font-weight: 600;
-}
-
-.badge.available {
-    background: #e8f5e9;
-    color: #27ae60;
-}
-
-.badge.unavailable {
-    background: #ffebee;
-    color: #e74c3c;
-}
-
-.badge.ADMIN {
-    background: #ffebee;
-    color: #c62828;
-}
-
-.badge.USER {
-    background: #e3f2fd;
-    color: #1565c0;
-}
-
-.badge.ACTIVE {
-    background: #fff3e0;
-    color: #f57c00;
-}
-
-.badge.RETURNED {
-    background: #e8f5e9;
-    color: #27ae60;
-}
-
-.badge.pending, .badge.PENDING {
-    background: #fff8e1;
-    color: #f57c00;
-}
-
-.badge.APPROVED {
-    background: #e8f5e9;
-    color: #27ae60;
-}
-
-.badge.REJECTED {
-    background: #ffebee;
-    color: #e74c3c;
-}
-
-/* Alert (Eski sistem - geriye dönük uyumluluk için) */
-.alert {
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: none;
-}
-
-.alert.show {
-    display: block;
-}
-
-.alert.success {
-    background: #e8f5e9;
-    color: #27ae60;
-    border-left: 4px solid #27ae60;
-}
-
-.alert.error {
-    background: #ffebee;
-    color: #e74c3c;
-    border-left: 4px solid #e74c3c;
-}
-
-/* Toast Notification */
-#toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    pointer-events: none;
-}
-
-.toast {
-    min-width: 300px;
-    max-width: 400px;
-    padding: 16px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: slideInRight 0.3s ease-out;
-    pointer-events: auto;
-    position: relative;
-    overflow: hidden;
-}
-
-.toast::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-}
-
-.toast.success {
-    background: #ffffff;
-    color: #27ae60;
-    border: 1px solid #c8e6c9;
-}
-
-.toast.success::before {
-    background: #27ae60;
-}
-
-.toast.error {
-    background: #ffffff;
-    color: #e74c3c;
-    border: 1px solid #ffcdd2;
-}
-
-.toast.error::before {
-    background: #e74c3c;
-}
-
-.toast.info {
-    background: #ffffff;
-    color: #2196f3;
-    border: 1px solid #bbdefb;
-}
-
-.toast.info::before {
-    background: #2196f3;
-}
-
-.toast-icon {
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.toast-message {
-    flex: 1;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.toast-close {
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    font-size: 18px;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-dark);
+    margin: 0;
     padding: 0;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-    flex-shrink: 0;
 }
 
-.toast-close:hover {
-    opacity: 1;
+/* Genel Button Stili */
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
 }
 
-.toast.hiding {
-    animation: slideOutRight 0.3s ease-in forwards;
+.btn-primary:hover {
+    background-color: #019577 !important;
 }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+/* Scrollbar düzenlemesi */
+::-webkit-scrollbar {
+    width: 8px;
 }
-
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(400px);
-        opacity: 0;
-    }
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
-
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}

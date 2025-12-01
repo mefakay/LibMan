@@ -1,84 +1,215 @@
-/* ============================================
-   USER SAYFASI ÖZEL STİLLER
-   ============================================ */
+/* resources/static/css/user.css */
 
-body {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    padding: 20px;
+/* SIDEBAR TASARIMI */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--bg-white);
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 30px 20px;
+    border-right: 1px solid #f0f0f0;
+    z-index: 100;
 }
 
-.header {
-    border-bottom-color: #3498db;
+.brand-logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 50px;
 }
 
-h1 {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.user-box {
+    background: var(--bg-body);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
 }
 
-.back-btn {
-    background: #3498db;
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
-.back-btn:hover {
-    background: #2980b9;
+.nav-menu {
+    list-style: none;
+    padding: 0;
 }
 
-.user-select-section {
-    background: #e3f2fd;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    border-left: 5px solid #3498db;
+.nav-menu li {
+    margin-bottom: 12px;
 }
 
-.user-select-section h2 {
-    color: #3498db;
+.nav-menu a {
+    text-decoration: none;
+    color: var(--text-gray);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.nav-menu a:hover, .nav-menu a.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.25);
+}
+
+/* MAIN CONTENT ALANI */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 30px 50px;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.search-wrapper {
+    background: var(--bg-white);
+    padding: 12px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    width: 350px;
+    box-shadow: var(--card-shadow);
+}
+
+.search-wrapper input {
+    border: none;
+    outline: none;
+    width: 100%;
+    margin-left: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* DASHBOARD KARTLARI (Üstteki 3 kutu) */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: var(--bg-white);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-icon-bg {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
     margin-bottom: 15px;
 }
 
-.user-select-grid {
+.bg-teal { background: #e0f2f1; color: #009688; }
+.bg-orange { background: #fff3e0; color: #ef6c00; }
+.bg-blue { background: #e3f2fd; color: #1565c0; }
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+/* LISTE ALANI (Book List) */
+.content-grid {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 2fr 1fr; /* Sol geniş, sağ dar */
+    gap: 30px;
+}
+
+.content-card {
+    background: var(--bg-white);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+/* Özel Liste Elemanları */
+.custom-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.item-left {
+    display: flex;
+    align-items: center;
     gap: 15px;
-    align-items: end;
 }
 
-.section {
-    border-left-color: #3498db;
+.item-icon {
+    width: 45px;
+    height: 45px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--text-dark);
 }
 
-.section h2 {
-    color: #3498db;
+.item-info h5 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
 }
 
-input:focus, select:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+.item-info span {
+    font-size: 12px;
+    color: var(--text-gray);
 }
 
-button {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
 }
 
-button:hover {
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-}
-
-thead {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-}
-
-.current-user {
-    background: #e3f2fd;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border-left: 4px solid #3498db;
-}
-
-.current-user strong {
-    color: #2980b9;
-}
-
+.badge-success { background: #e6f7f4; color: var(--primary-color); }
+.badge-warning { background: #fff8e1; color: #ffa000; }

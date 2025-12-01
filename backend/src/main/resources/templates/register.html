@@ -3,161 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kayıt Ol - Lib-Man</title>
-
-    <style>
-
-        /* Mint Arka Plan */
-        body {
-            background: linear-gradient(135deg, #b2f7ef 0%, #5ccccc 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-
-        /* Card */
-        .login-card {
-            background: #ffffff;
-            width: 100%;
-            max-width: 430px;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0,100,100,0.15);
-            border: 1px solid #c8e7e7;
-        }
-
-        .login-card h1 {
-            text-align: center;
-            color: #0f7f7f;
-            margin-bottom: 25px;
-            font-weight: 700;
-            font-size: 26px;
-        }
-
-        /* Form */
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            color: #005a5a;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            border-radius: 8px;
-            border: 2px solid #c8e7e7;
-            background: #eafffa;
-            transition: .25s;
-            color: #004a4a;
-        }
-
-        .form-group input:focus {
-            border-color: #14b8b8;
-            box-shadow: 0 0 0 3px rgba(20,184,184,.2);
-            outline: none;
-        }
-
-        /* Register Button */
-        .btn-login {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #14b8b8 0%, #0f7f7f 100%);
-            border: none;
-            color: white;
-            font-weight: 600;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: .25s;
-            margin-top: 10px;
-        }
-
-        .btn-login:hover {
-            box-shadow: 0 8px 15px rgba(0,150,150,0.25);
-            transform: translateY(-2px);
-        }
-
-        /* Error Box */
-        .error-msg {
-            background: #ffefef;
-            color: #c62828;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 18px;
-            font-weight: 600;
-        }
-
-        .register-link {
-            margin-top: 18px;
-            text-align: center;
-            font-size: 14px;
-            color: #004f4f;
-        }
-
-        .register-link a {
-            color: #0f7f7f;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
-    </style>
+    <title>Kayıt Ol | Lib-Man</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
-
 <body>
 
-<div class="login-card">
-    <h1>📝 Yeni Hesap Oluştur</h1>
+<div class="auth-container">
 
-    <div th:if="${errorMessage}" class="error-msg">
-        <span th:text="${errorMessage}"></span>
+    <div class="auth-left" style="background: linear-gradient(135deg, #0984e3 0%, #6c5ce7 100%);">
+        <div class="brand-icon">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h2>Aramıza Katıl</h2>
+        <p>
+            Ücretsiz hesap oluşturarak kütüphane kataloğuna erişin,
+            kitap ayırtın ve okuma geçmişinizi takip edin.
+        </p>
     </div>
 
-    <form th:action="@{/api/auth/register}" method="post">
+    <div class="auth-right">
 
-        <div class="form-group">
-            <label>Ad Soyad</label>
-            <input type="text" name="fullName" placeholder="Adınız Soyadınız" required>
+        <div class="auth-header">
+            <h1 class="auth-title">Hesap Oluştur 🚀</h1>
+            <p class="auth-subtitle">Sadece birkaç saniye sürer.</p>
         </div>
 
-        <div class="form-group">
-            <label>Kullanıcı Adı</label>
-            <input type="text" name="username" placeholder="Kullanıcı adı seçin" required>
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span th:text="${errorMessage}"></span>
         </div>
 
-        <div class="form-group">
-            <label>E-posta</label>
-            <input type="email" name="email" placeholder="ornek@mail.com" required>
+        <form th:action="@{/api/auth/register}" method="post">
+
+            <div class="form-group">
+                <label class="form-label">Ad Soyad</label>
+                <input type="text" name="fullName" class="form-control" placeholder="Adınız Soyadınız" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Kullanıcı Adı</label>
+                <input type="text" name="username" class="form-control" placeholder="Kullanıcı adı seçin" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">E-posta</label>
+                <input type="email" name="email" class="form-control" placeholder="ornek@mail.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Şifre</label>
+                <input type="password" name="password" class="form-control" placeholder="Güçlü bir şifre girin" required>
+            </div>
+
+            <input type="hidden" name="role" value="USER">
+
+            <button type="submit" class="btn-auth">Kayıt Ol</button>
+
+        </form>
+
+        <div class="auth-footer">
+            Zaten hesabınız var mı? <a th:href="@{/login}">Giriş Yap</a>
         </div>
-
-        <div class="form-group">
-            <label>Şifre</label>
-            <input type="password" name="password" placeholder="******" required>
-        </div>
-
-        <input type="hidden" name="role" value="USER">
-
-        <button class="btn-login">Kayıt Ol</button>
-    </form>
-
-    <div class="register-link">
-        Zaten hesabınız var mı? <a th:href="@{/login}">Giriş Yap</a>
     </div>
+
 </div>
 
 </body>
