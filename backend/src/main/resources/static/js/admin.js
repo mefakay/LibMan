@@ -1,29 +1,22 @@
 /* resources/static/js/admin.js */
 
 document.addEventListener("DOMContentLoaded", function() {
-    loadStats(); // İstatistikleri yükle
-    loadBooks(); // Varsayılan olarak kitapları da yükleyelim
+    loadStats();
+    // VARSAYILAN OLARAK KİTAPLAR SEKMESİ AÇILSIN
+    loadBooks();
+    document.getElementById('view-books').style.display = 'block';
 });
 
 // GÖRÜNÜM DEĞİŞTİRME
-/* --- MENÜ GEÇİŞ FONKSİYONU --- */
 function showView(viewName) {
-    // 1. Tüm menü linklerinden 'active' sınıfını temizle
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
-
-    // 2. Tıklanan linke 'active' sınıfını ekle
     event.target.closest('a').classList.add('active');
 
-    // 3. Tüm Sayfa Bölümlerini (View) Gizle
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
 
-    // 4. Seçilen Bölümü Göster
-    const targetView = document.getElementById('view-' + viewName);
-    if (targetView) {
-        targetView.style.display = 'block';
-    }
+    const targetView = document.getElementById(`view-${viewName}`);
+    if(targetView) targetView.style.display = 'block';
 
-    // 5. Verileri Tazele (Opsiyonel: Her tıklamada veri yenilensin istersen)
     if(viewName === 'books') loadBooks();
     if(viewName === 'requests') loadRequests();
     if(viewName === 'users') loadUsers();
@@ -39,16 +32,19 @@ async function loadStats() {
             apiGet('/admin/borrows')
         ]);
 
+        // FİLTRELİ SAYIM (Hata düzeltilmiş hali)
+        const pendingCount = requests.filter(r => r.status === 'PENDING').length;
+        const activeBorrowsCount = borrows.filter(b => b.status === 'ACTIVE').length;
+
         document.getElementById('countBooks').innerText = books.length;
         document.getElementById('countUsers').innerText = users.length;
-        document.getElementById('countRequests').innerText = requests.length;
-        document.getElementById('countBorrows').innerText = borrows.filter(b => b.status === 'ACTIVE').length;
+        document.getElementById('countRequests').innerText = pendingCount;
+        document.getElementById('countBorrows').innerText = activeBorrowsCount;
 
-        // Rozet Güncelle
         const badge = document.getElementById('badgeRequests');
-        if(requests.length > 0) {
+        if(pendingCount > 0) {
             badge.style.display = 'inline-block';
-            badge.innerText = requests.length;
+            badge.innerText = pendingCount;
         } else {
             badge.style.display = 'none';
         }
@@ -63,7 +59,6 @@ async function loadBooks() {
 
     try {
         const books = await apiGet('/admin/books');
-
         if(books.length === 0) {
             container.innerHTML = '<div class="text-muted text-center">Kitap yok.</div>';
             return;
@@ -86,7 +81,7 @@ async function loadBooks() {
                     <button onclick="deleteBook(${book.id})" class="btn btn-sm btn-light text-danger" title="Sil">
                         <i class="fas fa-trash"></i>
                     </button>
-                    </div>
+                </div>
             </div>`;
         });
         container.innerHTML = html;
@@ -112,8 +107,6 @@ async function addBook() {
     try {
         await apiPost('/admin/books', book);
         showToast('Başarılı', 'Kitap eklendi!');
-
-        // Formu temizle ve listeyi yenile
         document.getElementById('bookTitle').value = '';
         document.getElementById('bookIsbn').value = '';
         loadBooks();
@@ -132,14 +125,14 @@ async function deleteBook(id) {
     } catch(e) { showToast('Hata', e.message); }
 }
 
-// 5. İSTEKLERİ LİSTELE & YÖNET
+// 5. İSTEKLERİ LİSTELE
 async function loadRequests() {
     const container = document.getElementById('requestsListContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-danger"></div></div>';
 
     try {
-        // Backend'den sadece PENDING olanları alacağız (filtreleme backend'de veya burada)
-        const requests = await apiGet('/admin/borrow-requests/pending'); // Endpoint'in doğru olduğundan emin ol
+        const requests = await apiGet('/admin/borrow-requests/pending');
+        // Sadece bekleyenleri filtrele
         const pending = requests.filter(r => r.status === 'PENDING');
 
         if(pending.length === 0) {
@@ -174,7 +167,7 @@ async function loadRequests() {
 async function approveRequest(id) {
     try {
         await apiPost(`/admin/borrow-requests/${id}/approve`, {});
-        showToast('Başarılı', 'İstek onaylandı, kitap verildi.');
+        showToast('Başarılı', 'İstek onaylandı.');
         loadRequests();
         loadStats();
     } catch(e) { showToast('Hata', e.message); }
@@ -197,7 +190,6 @@ async function loadUsers() {
 
     try {
         const users = await apiGet('/admin/users');
-
         let html = '';
         users.forEach(u => {
             html += `

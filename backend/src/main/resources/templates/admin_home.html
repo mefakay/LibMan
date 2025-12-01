@@ -29,27 +29,9 @@
     </div>
 
     <ul class="nav-menu">
-        <li>
-            <a href="#" class="active" onclick="showView('dashboard')">
-                <i class="fas fa-home"></i> Özet Panel
-            </a>
-        </li>
-        <li>
-            <a href="#" onclick="showView('books')">
-                <i class="fas fa-book"></i> Kitap Yönetimi
-            </a>
-        </li>
-        <li>
-            <a href="#" onclick="showView('requests')">
-                <i class="fas fa-bell"></i> İstekler
-                <span id="badgeRequests" class="badge bg-danger ms-auto" style="display:none">0</span>
-            </a>
-        </li>
-        <li>
-            <a href="#" onclick="showView('users')">
-                <i class="fas fa-users"></i> Kullanıcılar
-            </a>
-        </li>
+        <li><a href="#" class="active" onclick="showView('books')"><i class="fas fa-book"></i> Kitap Yönetimi</a></li>
+        <li><a href="#" onclick="showView('requests')"><i class="fas fa-bell"></i> İstekler <span id="badgeRequests" class="badge bg-danger ms-auto" style="display:none">0</span></a></li>
+        <li><a href="#" onclick="showView('users')"><i class="fas fa-users"></i> Kullanıcılar</a></li>
         <li style="margin-top: 30px;">
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="btn btn-link text-decoration-none text-danger ps-3">
@@ -65,11 +47,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 style="font-weight: 700;">Yönetim Paneli</h3>
-            <p class="text-muted">Kütüphane durumunu buradan yönetebilirsiniz.</p>
-        </div>
-        <div class="bg-white p-2 rounded-pill shadow-sm d-flex align-items-center px-3" style="width: 300px;">
-            <i class="fas fa-search text-muted"></i>
-            <input type="text" class="border-0 ms-2 w-100" style="outline:none;" placeholder="Admin araması...">
+            <p class="text-muted">Kütüphane envanterini ve kullanıcıları yönetin.</p>
         </div>
     </div>
 
@@ -96,14 +74,7 @@
         </div>
     </div>
 
-    <div id="view-dashboard" class="view-section">
-        <div class="content-card">
-            <h5 class="mb-3">📢 Son Hareketler</h5>
-            <p class="text-muted">Sistemdeki son aktiviteler burada listelenecek (Şimdilik statik).</p>
-        </div>
-    </div>
-
-    <div id="view-books" class="view-section" style="display: none;">
+    <div id="view-books" class="view-section">
         <div class="content-card mb-4" style="border-left: 5px solid var(--primary-color);">
             <div class="card-header-flex mb-2" style="border:none;">
                 <h5 class="m-0"><i class="fas fa-plus-circle me-2"></i> Yeni Kitap Ekle</h5>

@@ -1,34 +1,23 @@
 /* resources/static/js/user.js */
 
-// Global Değişkenler
 const username = document.getElementById('currentUsername').value;
 let allBooks = [];
 
-// Sayfa Yüklendiğinde
 document.addEventListener("DOMContentLoaded", function() {
-    loadBooks();       // Varsayılan açılış
-    updateStats();     // İstatistikleri güncelle
-
-    // Arama Kutusu
-    document.getElementById('searchInput').addEventListener('keyup', function(e) {
-        filterBooks(e.target.value.toLowerCase());
-    });
+    loadBooks();
+    updateStats();
+    // ARAMA DİNLEYİCİSİ SİLİNDİ
 });
 
 /* --- MENÜ GEÇİŞ FONKSİYONU --- */
 function showSection(section) {
-    // Menü aktiflik ayarı
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
     event.target.closest('a').classList.add('active');
 
-    // Başlık ve Konteyner
     const listTitle = document.querySelector('.content-card h4') || document.querySelector('.content-card h5');
     const container = document.getElementById('bookListContainer');
-
-    // Yükleniyor animasyonu
     container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-success"></div></div>';
 
-    // İçerik Yükleme
     if (section === 'catalog') {
         if(listTitle) listTitle.innerText = '📚 Kitap Kataloğu';
         loadBooks();
@@ -41,47 +30,40 @@ function showSection(section) {
     }
 }
 
-/* ================= VERİ YÜKLEME ================= */
+// ... GERİ KALAN FONKSİYONLAR AYNEN KALIYOR (loadBooks, loadMyBooks, updateStats vs...)
+// Sadece apiGet, apiPost çağrıları ve render fonksiyonları.
+// "filterBooks" fonksiyonu artık kullanılmayacağı için kaldırılabilir veya kalabilir zararı yok.
+// Yukarıdaki User.js'in önceki versiyonunu kullanabilirsiniz, sadece "DOMContentLoaded" içindeki arama satırını silin.
 
-// 1. KATALOG (Tüm Kitaplar)
+/* --- Geri Kalan Kodun Tamamı İçin Aşağıyı Kopyala --- */
+
 async function loadBooks() {
     const container = document.getElementById('bookListContainer');
     try {
         const books = await apiGet('/user/books/all');
         allBooks = books;
-
         if (!books || books.length === 0) {
             container.innerHTML = '<div class="text-center text-muted py-3">Kütüphanede kitap bulunamadı.</div>';
             return;
         }
-
-        renderList(books, 'book');
-    } catch (error) {
-        showError(container, error);
-    }
+        renderList(books);
+    } catch (error) { showError(container, error); }
 }
 
-// 2. KİTAPLARIM (DÜZELTİLEN KISIM)
 async function loadMyBooks() {
     const container = document.getElementById('bookListContainer');
     try {
         const borrows = await apiGet(`/user/borrows/username/${username}`);
-
         if (!borrows || borrows.length === 0) {
             container.innerHTML = '<div class="text-center text-muted py-3">Henüz ödünç aldığınız kitap yok.</div>';
             return;
         }
-
-        // HATA DÜZELTME: Sıralamayı null kontrolünden SONRA yapıyoruz
         borrows.sort((a, b) => (a.status === 'ACTIVE' ? -1 : 1));
-
         let html = '';
         borrows.forEach(b => {
             const isActive = b.status === 'ACTIVE';
-            // Güvenli erişim: b.book null ise hata vermesin
             const title = b.book ? b.book.title : 'Bilinmeyen Kitap';
             const author = b.book ? b.book.author : '-';
-
             html += `
             <div class="custom-list-item">
                 <div class="item-left">
@@ -102,33 +84,24 @@ async function loadMyBooks() {
             </div>`;
         });
         container.innerHTML = html;
-
-    } catch (error) {
-        showError(container, error);
-    }
+    } catch (error) { showError(container, error); }
 }
 
-// 3. İSTEKLERİM
 async function loadMyRequests() {
     const container = document.getElementById('bookListContainer');
     try {
         const requests = await apiGet(`/user/${username}/borrow-requests`);
-
         if (!requests || requests.length === 0) {
             container.innerHTML = '<div class="text-center text-muted py-3">Ödünç isteğiniz yok.</div>';
             return;
         }
-
-        requests.sort((a, b) => b.id - a.id); // Yeniden eskiye
-
+        requests.sort((a, b) => b.id - a.id);
         let html = '';
         requests.forEach(r => {
             let style = r.status === 'PENDING' ? 'background:#fff8e1; color:#ffa000' :
                         (r.status === 'APPROVED' ? 'background:#e6f7f4; color:#00b894' : 'background:#ffebee; color:#c62828');
             let text = r.status === 'PENDING' ? '⏳ Beklemede' : (r.status === 'APPROVED' ? '✅ Onaylandı' : '❌ Reddedildi');
-
             const title = r.book ? r.book.title : 'Kitap Silinmiş';
-
             html += `
             <div class="custom-list-item">
                 <div class="item-left">
@@ -144,15 +117,9 @@ async function loadMyRequests() {
             </div>`;
         });
         container.innerHTML = html;
-
-    } catch (error) {
-        showError(container, error);
-    }
+    } catch (error) { showError(container, error); }
 }
 
-/* ================= YARDIMCI FONKSİYONLAR ================= */
-
-// Listeyi Ekrana Bas (Katalog için)
 function renderList(list) {
     const container = document.getElementById('bookListContainer');
     let html = '';
@@ -181,7 +148,6 @@ function renderList(list) {
     container.innerHTML = html;
 }
 
-// İstatistikleri Güncelle
 async function updateStats() {
     try {
         const [books, borrows, requests] = await Promise.all([
@@ -190,32 +156,32 @@ async function updateStats() {
             apiGet(`/user/${username}/borrow-requests`)
         ]);
 
-        document.getElementById('totalBooksCount').innerText = books.length;
-        document.getElementById('activeBorrowsCount').innerText = borrows.filter(b => b.status === 'ACTIVE').length;
-        document.getElementById('pendingRequestsCount').innerText = requests.filter(r => r.status === 'PENDING').length;
+        // "activeBorrowsCount" hesaplaması kalabilir ama HTML'e yazma satırını siliyoruz.
+        const pendingRequestsCount = requests.filter(r => r.status === 'PENDING').length;
 
-        // Son Hareketler Paneli
+        document.getElementById('totalBooksCount').innerText = books.length;
+
+        // --- SİLİNEN SATIR: document.getElementById('activeBorrowsCount').innerText = ... ---
+        // Artık o HTML elementi yok, o yüzden o satırı sildik.
+
+        document.getElementById('pendingRequestsCount').innerText = pendingRequestsCount;
+
         updateRecentActivity(borrows, requests);
 
     } catch (error) { console.error("İstatistik hatası:", error); }
 }
 
-// Sağ Panel Son Hareketler
 function updateRecentActivity(borrows, requests) {
     const container = document.getElementById('recentActivity');
     let activities = [];
-
     if(borrows) borrows.forEach(b => activities.push({ type: 'borrow', date: b.borrowDate, title: b.book.title }));
     if(requests) requests.forEach(r => activities.push({ type: 'request', date: r.requestDate, title: r.book.title }));
-
     activities.sort((a, b) => new Date(b.date) - new Date(a.date));
     activities = activities.slice(0, 4);
-
     if (activities.length === 0) {
         container.innerHTML = '<small class="text-muted d-block text-center">İşlem yok.</small>';
         return;
     }
-
     let html = '';
     activities.forEach(act => {
         let icon = act.type === 'borrow' ? '<i class="fas fa-book text-primary"></i>' : '<i class="fas fa-paper-plane text-warning"></i>';
@@ -231,19 +197,10 @@ function updateRecentActivity(borrows, requests) {
     container.innerHTML = html;
 }
 
-// Hata Gösterici
 function showError(container, error) {
-    console.error(error);
     container.innerHTML = `<div class="text-danger text-center py-3">Veriler yüklenirken hata oluştu.<br><small>${error.message}</small></div>`;
 }
 
-// Filtreleme
-function filterBooks(term) {
-    const filtered = allBooks.filter(book => book.title.toLowerCase().includes(term) || book.author.toLowerCase().includes(term));
-    renderList(filtered);
-}
-
-// İşlemler
 async function borrowRequest(bookId) {
     try {
         await apiPost(`/user/borrow-request/${username}/${bookId}`, {});
