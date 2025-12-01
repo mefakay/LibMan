@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function showView(viewName) {
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
     event.target.closest('a').classList.add('active');
+
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
     const targetView = document.getElementById(`view-${viewName}`);
     if(targetView) targetView.style.display = 'block';
@@ -16,7 +17,11 @@ function showView(viewName) {
     if(viewName === 'books') loadBooks();
     if(viewName === 'requests') loadRequests();
     if(viewName === 'users') loadUsers();
+    if(viewName === 'profile-requests') loadProfileRequests(); // YENİ
 }
+
+// ... (loadStats, loadBooks, loadRequests, vb. ESKİ FONKSİYONLAR AYNI KALACAK) ...
+// Buradaki tek fark "loadUsers" içine "Sil" butonu eklemek ve aşağıya yeni fonksiyonları eklemek.
 
 async function loadStats() {
     try {
@@ -36,55 +41,31 @@ async function loadStats() {
         document.getElementById('countBorrows').innerText = activeBorrowsCount;
 
         const badge = document.getElementById('badgeRequests');
-        if(pendingCount > 0) {
-            badge.style.display = 'inline-block';
-            badge.innerText = pendingCount;
-        } else {
-            badge.style.display = 'none';
-        }
+        if(pendingCount > 0) { badge.style.display = 'inline-block'; badge.innerText = pendingCount; }
+        else { badge.style.display = 'none'; }
     } catch (e) { console.error(e); }
 }
 
-// 2. KİTAPLARI LİSTELE (GÜNCELLENDİ: DÜZENLE BUTONU EKLENDİ)
 async function loadBooks() {
     const container = document.getElementById('booksListContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-success"></div></div>';
-
     try {
         const books = await apiGet('/admin/books');
-        if(books.length === 0) {
-            container.innerHTML = '<div class="text-muted text-center">Kitap yok.</div>';
-            return;
-        }
-
+        if(books.length === 0) { container.innerHTML = '<div class="text-muted text-center">Kitap yok.</div>'; return; }
         let html = '';
         books.forEach(book => {
-            // Tırnak işaretleri sorunu olmaması için escape yapıyoruz
             const safeTitle = book.title.replace(/'/g, "\\'");
             const safeAuthor = book.author.replace(/'/g, "\\'");
             const year = book.publicationYear || 0;
-
             html += `
             <div class="custom-list-item">
                 <div class="item-left">
-                    <div class="item-icon" style="background:#e0f2f1; color:#009688;">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div>
-                        <h6 class="m-0 fw-bold">${book.title}</h6>
-                        <span class="text-muted" style="font-size:12px;">${book.author} • Stok: ${book.availableCopies}/${book.totalCopies}</span>
-                    </div>
+                    <div class="item-icon" style="background:#e0f2f1; color:#009688;"><i class="fas fa-book"></i></div>
+                    <div><h6 class="m-0 fw-bold">${book.title}</h6><span class="text-muted" style="font-size:12px;">${book.author} • Stok: ${book.availableCopies}/${book.totalCopies}</span></div>
                 </div>
                 <div class="action-buttons">
-                    <button onclick="openEditModal(${book.id}, '${safeTitle}', '${safeAuthor}', '${book.isbn}', ${year}, ${book.totalCopies}, ${book.availableCopies})"
-                            class="btn btn-sm btn-light text-primary" title="Düzenle / Stok Arttır">
-                        <i class="fas fa-edit"></i>
-                    </button>
-
-                    <button onclick="openDeleteModal(${book.id}, '${safeTitle}', '${safeAuthor}', '${book.isbn}', ${year}, ${book.totalCopies}, ${book.availableCopies})"
-                            class="btn btn-sm btn-light text-danger" title="Sil / Stok Düş">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <button onclick="openEditModal(${book.id}, '${safeTitle}', '${safeAuthor}', '${book.isbn}', ${year}, ${book.totalCopies}, ${book.availableCopies})" class="btn btn-sm btn-light text-primary"><i class="fas fa-edit"></i></button>
+                    <button onclick="openDeleteModal(${book.id}, '${safeTitle}', '${safeAuthor}', '${book.isbn}', ${year}, ${book.totalCopies}, ${book.availableCopies})" class="btn btn-sm btn-light text-danger"><i class="fas fa-trash"></i></button>
                 </div>
             </div>`;
         });
@@ -92,70 +73,84 @@ async function loadBooks() {
     } catch (e) { container.innerHTML = 'Hata oluştu.'; }
 }
 
-/* ==================================================
-   YENİ: KİTAP DÜZENLEME VE STOK ARTTIRMA
-   ================================================== */
-
-function openEditModal(id, title, author, isbn, year, total, available) {
-    // Formu doldur
-    document.getElementById('editBookId').value = id;
-    document.getElementById('editTitle').value = title;
-    document.getElementById('editAuthor').value = author;
-    document.getElementById('editIsbn').value = isbn;
-    document.getElementById('editYear').value = year;
-    document.getElementById('editTotal').value = total;
-
-    // Hesaplama yapmak için eski değerleri sakla
-    document.getElementById('editOldTotal').value = total;
-    document.getElementById('editOldAvailable').value = available;
-
-    new bootstrap.Modal(document.getElementById('editBookModal')).show();
-}
-
-async function saveBookUpdate() {
-    const id = document.getElementById('editBookId').value;
-    const newTotal = parseInt(document.getElementById('editTotal').value);
-    const oldTotal = parseInt(document.getElementById('editOldTotal').value);
-    const oldAvailable = parseInt(document.getElementById('editOldAvailable').value);
-
-    // Otomatik Stok Hesaplama:
-    // Eğer admin toplam stoğu 5'ten 10'a çıkardıysa (+5 fark),
-    // Mevcut stok da (örneğin 2 ise) 2 + 5 = 7 olmalı.
-    const difference = newTotal - oldTotal;
-    const newAvailable = oldAvailable + difference;
-
-    if (newAvailable < 0) {
-        showToast('Hata', 'Toplam stok sayısını, şu an ödünçte olan kitap sayısından daha aza düşüremezsiniz!');
-        return;
-    }
-
-    const updatedBook = {
-        title: document.getElementById('editTitle').value,
-        author: document.getElementById('editAuthor').value,
-        isbn: document.getElementById('editIsbn').value,
-        publicationYear: parseInt(document.getElementById('editYear').value),
-        totalCopies: newTotal,
-        availableCopies: newAvailable // Hesaplanan yeni mevcut stok
-    };
-
+async function loadUsers() {
+    const container = document.getElementById('usersListContainer');
+    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
     try {
-        await apiPut(`/admin/books/${id}`, updatedBook);
-        showToast('Başarılı', 'Kitap bilgileri ve stok güncellendi.');
+        const users = await apiGet('/admin/users');
+        let html = '';
+        users.forEach(u => {
+            // YENİ: SİL BUTONU
+            const deleteBtn = u.role === 'ADMIN' ? '' : `<button onclick="deleteUser(${u.id})" class="btn btn-sm btn-light text-danger"><i class="fas fa-trash-alt"></i></button>`;
 
-        const modalEl = document.getElementById('editBookModal');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
-
-        loadBooks();
-        loadStats();
-    } catch(e) {
-        showToast('Hata', e.message);
-    }
+            html += `
+            <div class="custom-list-item">
+                <div class="item-left">
+                    <div class="item-icon" style="background:#e3f2fd; color:#1565c0;"><i class="fas fa-user"></i></div>
+                    <div><h6 class="m-0 fw-bold">${u.fullName}</h6><span class="text-muted" style="font-size:12px;">@${u.username} • ${u.email}</span></div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge ${u.role === 'ADMIN' ? 'bg-danger' : 'bg-primary'}">${u.role}</span>
+                    ${deleteBtn}
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch(e) { container.innerHTML = 'Hata.'; }
 }
 
-/* ==================================================
-   SİLME İŞLEMLERİ (Önceki kodun aynısı)
-   ================================================== */
+// === YENİ: KULLANICI SİLME ===
+async function deleteUser(id) {
+    if(!confirm("DİKKAT! Bu kullanıcıyı sildiğinizde tüm geçmişi silinir. Emin misiniz?")) return;
+    try {
+        await apiDelete(`/admin/users/${id}`);
+        showToast('Başarılı', 'Kullanıcı silindi.');
+        loadUsers(); loadStats();
+    } catch(e) { showToast('Hata', e.message); }
+}
+
+// === YENİ: PROFİL İSTEKLERİNİ YÖNETME ===
+async function loadProfileRequests() {
+    const container = document.getElementById('profileRequestsContainer');
+    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
+    try {
+        const reqs = await apiGet('/admin/profile-requests/pending');
+        if(reqs.length === 0) { container.innerHTML = '<div class="text-muted text-center">Bekleyen profil isteği yok.</div>'; return; }
+        let html = '';
+        reqs.forEach(r => {
+            html += `
+            <div class="custom-list-item">
+                <div class="item-left">
+                    <div class="item-icon" style="background:#fff3e0; color:#ef6c00;"><i class="fas fa-user-edit"></i></div>
+                    <div>
+                        <div class="mb-1"><span class="fw-bold">${r.user.username}</span> <i class="fas fa-arrow-right mx-2 text-muted" style="font-size:12px;"></i> <span class="text-primary fw-bold">${r.newUsername}</span></div>
+                        <div class="small text-muted">${r.user.email} <i class="fas fa-arrow-right mx-2" style="font-size:10px;"></i> ${r.newEmail}</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="approveProfile(${r.id})" class="btn btn-success btn-sm">Onayla</button>
+                    <button onclick="rejectProfile(${r.id})" class="btn btn-outline-danger btn-sm">Reddet</button>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch(e) { container.innerHTML = 'Hata oluştu.'; }
+}
+
+async function approveProfile(id) {
+    try { await apiPost(`/admin/profile-requests/${id}/approve`, {}); showToast('Başarılı', 'Profil güncellendi.'); loadProfileRequests(); }
+    catch(e) { showToast('Hata', e.message); }
+}
+async function rejectProfile(id) {
+    if(!confirm("Reddet?")) return;
+    try { await apiPost(`/admin/profile-requests/${id}/reject`, {}); showToast('Bilgi', 'Reddedildi.'); loadProfileRequests(); }
+    catch(e) { showToast('Hata', e.message); }
+}
+
+// === DİĞER (Kitap Ekle/Sil/Düzenle, Ödünç İstekleri) KODLAR AYNEN KALACAK ===
+// (Yer kaplamaması için buraya tekrar yapıştırmıyorum, önceki admin.js'den kopyalayabilirsin.
+// Sadece yukarıdaki loadBooks, loadUsers ve yeni fonksiyonları güncellemen yeterli)
+
 function openDeleteModal(id, title, author, isbn, year, total, available) {
     document.getElementById('modalDeleteId').value = id;
     document.getElementById('modalDeleteTitle').innerText = title;
@@ -174,8 +169,6 @@ async function confirmReduceStock() {
     const amount = parseInt(document.getElementById('deleteAmount').value);
     const currentTotal = parseInt(document.getElementById('modalCurrentTotal').innerText);
     const currentAvailable = parseInt(document.getElementById('modalCurrentAvailable').innerText);
-
-    // Diğer verileri de al
     const title = document.getElementById('modalDeleteTitleHidden').value;
     const author = document.getElementById('modalDeleteAuthor').value;
     const isbn = document.getElementById('modalDeleteIsbn').value;
@@ -209,7 +202,45 @@ async function confirmDeleteCompletely() {
     } catch(e) { showToast('Hata', e.message); }
 }
 
-// EKLEME, İSTEK VE USER FONKSİYONLARI AYNEN KALIYOR...
+function openEditModal(id, title, author, isbn, year, total, available) {
+    document.getElementById('editBookId').value = id;
+    document.getElementById('editTitle').value = title;
+    document.getElementById('editAuthor').value = author;
+    document.getElementById('editIsbn').value = isbn;
+    document.getElementById('editYear').value = year;
+    document.getElementById('editTotal').value = total;
+    document.getElementById('editOldTotal').value = total;
+    document.getElementById('editOldAvailable').value = available;
+    new bootstrap.Modal(document.getElementById('editBookModal')).show();
+}
+
+async function saveBookUpdate() {
+    const id = document.getElementById('editBookId').value;
+    const newTotal = parseInt(document.getElementById('editTotal').value);
+    const oldTotal = parseInt(document.getElementById('editOldTotal').value);
+    const oldAvailable = parseInt(document.getElementById('editOldAvailable').value);
+    const difference = newTotal - oldTotal;
+    const newAvailable = oldAvailable + difference;
+
+    if (newAvailable < 0) { showToast('Hata', 'Stok hatası.'); return; }
+
+    const updatedBook = {
+        title: document.getElementById('editTitle').value,
+        author: document.getElementById('editAuthor').value,
+        isbn: document.getElementById('editIsbn').value,
+        publicationYear: parseInt(document.getElementById('editYear').value),
+        totalCopies: newTotal,
+        availableCopies: newAvailable
+    };
+
+    try {
+        await apiPut(`/admin/books/${id}`, updatedBook);
+        showToast('Başarılı', 'Güncellendi.');
+        bootstrap.Modal.getInstance(document.getElementById('editBookModal')).hide();
+        loadBooks(); loadStats();
+    } catch(e) { showToast('Hata', e.message); }
+}
+
 function toggleAddBookForm() {
     const form = document.getElementById('addBookFormContainer');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
@@ -245,13 +276,8 @@ async function loadRequests() {
             html += `
             <div class="custom-list-item">
                 <div class="item-left">
-                    <div class="item-icon" style="background:#ffebee; color:#e53935;">
-                        <i class="fas fa-user-clock"></i>
-                    </div>
-                    <div>
-                        <h6 class="m-0 fw-bold">${req.user.fullName}</h6>
-                        <span class="text-muted" style="font-size:12px;">İstediği: <strong>${req.book.title}</strong></span>
-                    </div>
+                    <div class="item-icon" style="background:#ffebee; color:#e53935;"><i class="fas fa-user-clock"></i></div>
+                    <div><h6 class="m-0 fw-bold">${req.user.fullName}</h6><span class="text-muted" style="font-size:12px;">İstediği: <strong>${req.book.title}</strong></span></div>
                 </div>
                 <div class="action-buttons">
                     <button onclick="approveRequest(${req.id})" class="btn btn-success btn-sm">Onayla</button>
@@ -271,31 +297,6 @@ async function rejectRequest(id) {
     if(!confirm('Reddet?')) return;
     try { await apiPost(`/admin/borrow-requests/${id}/reject`, {}); showToast('Bilgi', 'Reddedildi.'); loadRequests(); loadStats(); }
     catch(e) { showToast('Hata', e.message); }
-}
-
-async function loadUsers() {
-    const container = document.getElementById('usersListContainer');
-    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
-    try {
-        const users = await apiGet('/admin/users');
-        let html = '';
-        users.forEach(u => {
-            html += `
-            <div class="custom-list-item">
-                <div class="item-left">
-                    <div class="item-icon" style="background:#e3f2fd; color:#1565c0;">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div>
-                        <h6 class="m-0 fw-bold">${u.fullName}</h6>
-                        <span class="text-muted" style="font-size:12px;">@${u.username}</span>
-                    </div>
-                </div>
-                <div><span class="badge ${u.role === 'ADMIN' ? 'bg-danger' : 'bg-primary'}">${u.role}</span></div>
-            </div>`;
-        });
-        container.innerHTML = html;
-    } catch(e) { container.innerHTML = 'Hata.'; }
 }
 
 function showToast(title, msg) {

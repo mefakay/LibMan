@@ -8,124 +8,125 @@ import com.library.libman.service.BookService;
 import com.library.libman.service.BorrowService;
 import com.library.libman.service.UserService;
 import com.library.libman.service.BorrowRequestService;
+import com.library.libman.service.ProfileUpdateRequestService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-import org.springframework.security.access.prepost.PreAuthorize; // Yeni
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// Yönetici işlemleri için API endpoint'leri
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')") // Sınıf düzeyinde ADMIN yetkilendirmesi
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
-    @Autowired
-    private BookService bookService;
+    @Autowired private BookService bookService;
+    @Autowired private UserService userService;
+    @Autowired private BorrowService borrowService;
+    @Autowired private BorrowRequestService requestService;
+    @Autowired private ProfileUpdateRequestService profileRequestService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private BorrowService borrowService;
-
-    @Autowired
-    private BorrowRequestService requestService;
-
-    // Tüm kitapları getirir
+    // --- KİTAP İŞLEMLERİ ---
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAllBooks() {
-        List<Book> books = bookService.getAllBooks();
-        return ResponseEntity.ok(books);
+        return ResponseEntity.ok(bookService.getAllBooks());
     }
 
-    // Yeni kitap ekler
     @PostMapping("/books")
     public ResponseEntity<?> addBook(@Valid @RequestBody Book book) {
         try {
-            Book savedBook = bookService.addBook(book);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    // Kitabı siler
     @DeleteMapping("/books/{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable @NonNull Long id) {
+    public ResponseEntity<?> deleteBook(@PathVariable Long id) {
         try {
             bookService.deleteBook(id);
-            return ResponseEntity.ok("Kitap başarıyla silindi");
+            return ResponseEntity.ok("Kitap silindi");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    // Kitap bilgilerini günceller
     @PutMapping("/books/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable @NonNull Long id, @Valid @RequestBody Book book) {
+    public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody Book book) {
         try {
-            Book updatedBook = bookService.updateBook(id, book);
-            return ResponseEntity.ok(updatedBook);
+            return ResponseEntity.ok(bookService.updateBook(id, book));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    // ID'ye göre kitap getirir
-    @GetMapping("/books/{id}")
-    public ResponseEntity<?> getBookById(@PathVariable @NonNull Long id) {
-        return bookService.getBookById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // Tüm kullanıcıları getirir
+    // --- KULLANICI İŞLEMLERİ ---
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    // Tüm ödünç kayıtlarını getirir
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok("Kullanıcı silindi.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- ÖDÜNÇ VE İSTEK İŞLEMLERİ ---
     @GetMapping("/borrows")
     public ResponseEntity<List<Borrow>> getAllBorrows() {
-        List<Borrow> borrows = borrowService.getAllBorrows();
-        return ResponseEntity.ok(borrows);
+        return ResponseEntity.ok(borrowService.getAllBorrows());
     }
 
-    //
-    // Tüm ödünç isteklerini getirir
     @GetMapping("/borrow-requests/pending")
     public ResponseEntity<List<BorrowRequest>> getAllRequests() {
-        List<BorrowRequest> requests = requestService.getAllBorrowRequests();
-        return ResponseEntity.ok(requests);
+        return ResponseEntity.ok(requestService.getAllBorrowRequests());
     }
 
-    // Kitap ödünç isteğini onaylar
     @PostMapping("/borrow-requests/{requestId}/approve")
     public ResponseEntity<?> approveBorrowRequest(@PathVariable Long requestId) {
         try {
-            Borrow borrow = requestService.acceptRequest(requestId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(borrow);
+            return ResponseEntity.status(HttpStatus.CREATED).body(requestService.acceptRequest(requestId));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    // Talebi reddeder
     @PostMapping("/borrow-requests/{requestId}/reject")
-    public ResponseEntity<?> rejectBorrowRequest(
-            @PathVariable Long requestId) {
+    public ResponseEntity<?> rejectBorrowRequest(@PathVariable Long requestId) {
         try {
-            BorrowRequest request = requestService.rejectRequest(requestId);
-            return ResponseEntity.ok(request);
+            return ResponseEntity.ok(requestService.rejectRequest(requestId));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    // --- PROFİL GÜNCELLEME İSTEKLERİ ---
+    @GetMapping("/profile-requests/pending")
+    public ResponseEntity<?> getProfileRequests() {
+        return ResponseEntity.ok(profileRequestService.getPendingRequests());
+    }
+
+    @PostMapping("/profile-requests/{id}/approve")
+    public ResponseEntity<?> approveProfileRequest(@PathVariable Long id) {
+        try {
+            profileRequestService.approveRequest(id);
+            return ResponseEntity.ok("Onaylandı");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/profile-requests/{id}/reject")
+    public ResponseEntity<?> rejectProfileRequest(@PathVariable Long id) {
+        profileRequestService.rejectRequest(id);
+        return ResponseEntity.ok("Reddedildi");
     }
 }

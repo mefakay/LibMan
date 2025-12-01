@@ -28,6 +28,9 @@
         <li><a href="#" class="active" onclick="showSection('catalog')"><i class="fas fa-th-large"></i> Ana Panel</a></li>
         <li><a href="#" onclick="showSection('mybooks')"><i class="fas fa-book"></i> Kitaplarım</a></li>
         <li><a href="#" onclick="showSection('requests')"><i class="fas fa-clock"></i> İstekler</a></li>
+
+        <li><a href="#" onclick="openSettingsModal()"><i class="fas fa-user-cog"></i> Profil Ayarları</a></li>
+
         <li style="margin-top: 30px;">
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="btn btn-link text-decoration-none text-danger ps-3">
@@ -95,6 +98,36 @@
     </div>
 
 </main>
+
+<div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-dark">⚙️ Profil Güncelleme İsteği</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info small">
+                    <i class="fas fa-info-circle"></i> Güvenlik gereği, kullanıcı adı ve e-posta değişiklikleri <b>yönetici onayı</b> gerektirir.
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-600">Kullanıcı Adı</label>
+                    <input type="text" id="reqUsername" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-600">E-posta Adresi</label>
+                    <input type="email" id="reqEmail" class="form-control">
+                </div>
+
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button onclick="submitProfileRequest()" class="btn btn-primary w-100">Değişiklik İsteği Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <input type="hidden" id="currentUsername" th:value="${username}">
 

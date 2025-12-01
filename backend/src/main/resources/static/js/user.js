@@ -6,16 +6,19 @@ let allBooks = [];
 document.addEventListener("DOMContentLoaded", function() {
     loadBooks();
     updateStats();
-    // ARAMA DİNLEYİCİSİ SİLİNDİ
 });
 
 /* --- MENÜ GEÇİŞ FONKSİYONU --- */
 function showSection(section) {
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
-    event.target.closest('a').classList.add('active');
+    // (Settings butonu bu fonksiyonu kullanmadığı için hata vermemesi adına kontrol)
+    if(event.target.closest('a').onclick.toString().includes('showSection')) {
+        event.target.closest('a').classList.add('active');
+    }
 
     const listTitle = document.querySelector('.content-card h4') || document.querySelector('.content-card h5');
     const container = document.getElementById('bookListContainer');
+
     container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-success"></div></div>';
 
     if (section === 'catalog') {
@@ -30,12 +33,36 @@ function showSection(section) {
     }
 }
 
-// ... GERİ KALAN FONKSİYONLAR AYNEN KALIYOR (loadBooks, loadMyBooks, updateStats vs...)
-// Sadece apiGet, apiPost çağrıları ve render fonksiyonları.
-// "filterBooks" fonksiyonu artık kullanılmayacağı için kaldırılabilir veya kalabilir zararı yok.
-// Yukarıdaki User.js'in önceki versiyonunu kullanabilirsiniz, sadece "DOMContentLoaded" içindeki arama satırını silin.
+// === YENİ: PROFİL AYARLARI FONKSİYONLARI ===
 
-/* --- Geri Kalan Kodun Tamamı İçin Aşağıyı Kopyala --- */
+async function openSettingsModal() {
+    try {
+        // Kullanıcının mevcut bilgilerini çek
+        const user = await apiGet('/user/me');
+        document.getElementById('reqUsername').value = user.username;
+        document.getElementById('reqEmail').value = user.email;
+        new bootstrap.Modal(document.getElementById('settingsModal')).show();
+    } catch (e) { showToast('Hata', 'Bilgiler alınamadı.'); }
+}
+
+async function submitProfileRequest() {
+    const data = {
+        username: document.getElementById('reqUsername').value,
+        email: document.getElementById('reqEmail').value
+    };
+
+    try {
+        await apiPost('/user/settings/profile-request', data);
+        showToast('Başarılı', 'İsteğiniz yöneticiye iletildi.');
+        bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+    } catch(e) {
+        // Backend'den gelen "Bu mail kullanılıyor" hatası burada gösterilecek
+        showToast('Hata', e.message);
+    }
+}
+
+// ... (loadBooks, loadMyBooks, loadMyRequests, updateStats, vb. ESKİ FONKSİYONLARIN AYNI KALACAK)
+// Aşağısı önceki kodların aynısıdır, kopyala yapıştır yapabilirsin.
 
 async function loadBooks() {
     const container = document.getElementById('bookListContainer');
@@ -155,19 +182,11 @@ async function updateStats() {
             apiGet(`/user/borrows/username/${username}`),
             apiGet(`/user/${username}/borrow-requests`)
         ]);
-
-        // "activeBorrowsCount" hesaplaması kalabilir ama HTML'e yazma satırını siliyoruz.
         const pendingRequestsCount = requests.filter(r => r.status === 'PENDING').length;
 
         document.getElementById('totalBooksCount').innerText = books.length;
-
-        // --- SİLİNEN SATIR: document.getElementById('activeBorrowsCount').innerText = ... ---
-        // Artık o HTML elementi yok, o yüzden o satırı sildik.
-
         document.getElementById('pendingRequestsCount').innerText = pendingRequestsCount;
-
         updateRecentActivity(borrows, requests);
-
     } catch (error) { console.error("İstatistik hatası:", error); }
 }
 
