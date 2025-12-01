@@ -125,6 +125,54 @@
 
 </main>
 
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border:none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">⚠️ Kitap Silme İşlemi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-4">
+                <p class="text-muted mb-2">İşlem yapılacak kitap:</p>
+                <h5 id="modalDeleteTitle" class="fw-bold text-dark mb-4">...</h5>
+
+                <div class="bg-light p-3 rounded mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Toplam Stok:</span>
+                        <strong id="modalCurrentTotal">0</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Rafta (Mevcut):</span>
+                        <strong id="modalCurrentAvailable">0</strong>
+                    </div>
+                </div>
+
+                <label class="form-label fw-600">Kaç adet silmek istiyorsunuz?</label>
+                <input type="number" id="deleteAmount" class="form-control" placeholder="Silinecek miktar girin" min="1">
+                <small class="text-secondary d-block mt-2" style="font-size: 12px;">
+                    * Sadece stok düşmek için sayı girip "Stoktan Düş"e basın.<br>
+                    * Kitabı tamamen kaldırmak için "Hepsini Sil"e basın.
+                </small>
+
+                <input type="hidden" id="modalDeleteId">
+                <input type="hidden" id="modalDeleteTitleHidden">
+                <input type="hidden" id="modalDeleteAuthor">
+                <input type="hidden" id="modalDeleteIsbn">
+                <input type="hidden" id="modalDeleteYear">
+
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button onclick="confirmReduceStock()" class="btn btn-warning text-white flex-grow-1">
+                    <i class="fas fa-minus-circle"></i> Stoktan Düş
+                </button>
+                <button onclick="confirmDeleteCompletely()" class="btn btn-danger flex-grow-1">
+                    <i class="fas fa-trash"></i> Hepsini Sil
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="adminToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">

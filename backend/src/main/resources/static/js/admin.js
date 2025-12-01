@@ -1,8 +1,7 @@
-/* resources/static/js/admin.js */
+/* resources/static/js/admin.js (GÜNCELLENMİŞ VERSİYON) */
 
 document.addEventListener("DOMContentLoaded", function() {
     loadStats();
-    // VARSAYILAN OLARAK KİTAPLAR SEKMESİ AÇILSIN
     loadBooks();
     document.getElementById('view-books').style.display = 'block';
 });
@@ -13,7 +12,6 @@ function showView(viewName) {
     event.target.closest('a').classList.add('active');
 
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
-
     const targetView = document.getElementById(`view-${viewName}`);
     if(targetView) targetView.style.display = 'block';
 
@@ -32,7 +30,6 @@ async function loadStats() {
             apiGet('/admin/borrows')
         ]);
 
-        // FİLTRELİ SAYIM (Hata düzeltilmiş hali)
         const pendingCount = requests.filter(r => r.status === 'PENDING').length;
         const activeBorrowsCount = borrows.filter(b => b.status === 'ACTIVE').length;
 
@@ -48,11 +45,10 @@ async function loadStats() {
         } else {
             badge.style.display = 'none';
         }
-
     } catch (e) { console.error(e); }
 }
 
-// 2. KİTAPLARI LİSTELE
+// 2. KİTAPLARI LİSTELE (GÜNCELLENDİ: Tüm verileri taşıyor)
 async function loadBooks() {
     const container = document.getElementById('booksListContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-success"></div></div>';
@@ -66,6 +62,11 @@ async function loadBooks() {
 
         let html = '';
         books.forEach(book => {
+            // Tırnak işaretleri hatası olmasın diye escape yapıyoruz
+            const safeTitle = book.title.replace(/'/g, "\\'");
+            const safeAuthor = book.author.replace(/'/g, "\\'");
+            const year = book.publicationYear || 0;
+
             html += `
             <div class="custom-list-item">
                 <div class="item-left">
@@ -78,7 +79,8 @@ async function loadBooks() {
                     </div>
                 </div>
                 <div class="action-buttons">
-                    <button onclick="deleteBook(${book.id})" class="btn btn-sm btn-light text-danger" title="Sil">
+                    <button onclick="openDeleteModal(${book.id}, '${safeTitle}', '${safeAuthor}', '${book.isbn}', ${year}, ${book.totalCopies}, ${book.availableCopies})"
+                            class="btn btn-sm btn-light text-danger" title="Sil / Stok Düş">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -86,6 +88,96 @@ async function loadBooks() {
         });
         container.innerHTML = html;
     } catch (e) { container.innerHTML = 'Hata oluştu.'; }
+}
+
+/* ==================================================
+   SİLME VE STOK İŞLEMLERİ (HATA DÜZELTİLDİ)
+   ================================================== */
+
+// Modalı Açan Fonksiyon (Verileri alıp gizli inputlara yazar)
+function openDeleteModal(id, title, author, isbn, year, total, available) {
+    document.getElementById('modalDeleteId').value = id;
+    document.getElementById('modalDeleteTitle').innerText = title;
+
+    // Gizli alanları doldur
+    document.getElementById('modalDeleteTitleHidden').value = title;
+    document.getElementById('modalDeleteAuthor').value = author;
+    document.getElementById('modalDeleteIsbn').value = isbn;
+    document.getElementById('modalDeleteYear').value = year;
+
+    document.getElementById('modalCurrentTotal').innerText = total;
+    document.getElementById('modalCurrentAvailable').innerText = available;
+    document.getElementById('deleteAmount').value = '';
+
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+
+// A. Stok Düşür (DÜZELTİLDİ: Tüm nesneyi gönderiyor)
+async function confirmReduceStock() {
+    const id = document.getElementById('modalDeleteId').value;
+    const amount = parseInt(document.getElementById('deleteAmount').value);
+    const currentTotal = parseInt(document.getElementById('modalCurrentTotal').innerText);
+    const currentAvailable = parseInt(document.getElementById('modalCurrentAvailable').innerText);
+
+    // Diğer verileri de al (Validation hatasını önlemek için)
+    const title = document.getElementById('modalDeleteTitleHidden').value;
+    const author = document.getElementById('modalDeleteAuthor').value;
+    const isbn = document.getElementById('modalDeleteIsbn').value;
+    const year = parseInt(document.getElementById('modalDeleteYear').value);
+
+    if (!amount || amount <= 0) {
+        showToast('Uyarı', 'Lütfen geçerli bir sayı girin.');
+        return;
+    }
+
+    if (amount > currentAvailable) {
+        showToast('Hata', 'Raftaki stoktan daha fazlasını silemezsiniz!');
+        return;
+    }
+
+    // Backend validation kurallarına uymak için tüm objeyi oluşturuyoruz
+    const updateData = {
+        title: title,
+        author: author,
+        isbn: isbn,
+        publicationYear: year === 0 ? null : year,
+        totalCopies: currentTotal - amount,
+        availableCopies: currentAvailable - amount
+    };
+
+    try {
+        await apiPut(`/admin/books/${id}`, updateData);
+        showToast('Başarılı', `${amount} adet kitap stoktan silindi.`);
+
+        const modalEl = document.getElementById('deleteModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        loadBooks();
+        loadStats();
+    } catch (e) {
+        showToast('Hata', e.message);
+    }
+}
+
+// B. Kitabı Tamamen Sil
+async function confirmDeleteCompletely() {
+    const id = document.getElementById('modalDeleteId').value;
+    if(!confirm('DİKKAT! Bu kitabı tamamen silmek üzeresiniz. Emin misiniz?')) return;
+
+    try {
+        await apiDelete(`/admin/books/${id}`);
+        showToast('Bilgi', 'Kitap tamamen silindi.');
+
+        const modalEl = document.getElementById('deleteModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        loadBooks();
+        loadStats();
+    } catch(e) {
+        showToast('Hata', e.message);
+    }
 }
 
 // 3. KİTAP EKLE
@@ -114,32 +206,20 @@ async function addBook() {
     } catch(e) { showToast('Hata', e.message); }
 }
 
-// 4. KİTAP SİL
-async function deleteBook(id) {
-    if(!confirm('Bu kitabı silmek istediğinize emin misiniz?')) return;
-    try {
-        await apiDelete(`/admin/books/${id}`);
-        showToast('Bilgi', 'Kitap silindi.');
-        loadBooks();
-        loadStats();
-    } catch(e) { showToast('Hata', e.message); }
-}
+// 5. İSTEKLER VE DİĞER FONKSİYONLAR AYNEN KALIYOR...
+// (Eski admin.js'deki loadRequests, approveRequest, rejectRequest, loadUsers, showToast fonksiyonları burada aynen kalmalı)
+// Yer kaplamasın diye tekrar yazmadım, alt kısımlar aynı.
 
-// 5. İSTEKLERİ LİSTELE
 async function loadRequests() {
     const container = document.getElementById('requestsListContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-danger"></div></div>';
-
     try {
         const requests = await apiGet('/admin/borrow-requests/pending');
-        // Sadece bekleyenleri filtrele
         const pending = requests.filter(r => r.status === 'PENDING');
-
         if(pending.length === 0) {
             container.innerHTML = '<div class="text-muted text-center">Bekleyen istek yok.</div>';
             return;
         }
-
         let html = '';
         pending.forEach(req => {
             html += `
@@ -160,7 +240,6 @@ async function loadRequests() {
             </div>`;
         });
         container.innerHTML = html;
-
     } catch(e) { container.innerHTML = 'Hata oluştu.'; }
 }
 
@@ -183,11 +262,9 @@ async function rejectRequest(id) {
     } catch(e) { showToast('Hata', e.message); }
 }
 
-// 6. KULLANICILARI LİSTELE
 async function loadUsers() {
     const container = document.getElementById('usersListContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
-
     try {
         const users = await apiGet('/admin/users');
         let html = '';
