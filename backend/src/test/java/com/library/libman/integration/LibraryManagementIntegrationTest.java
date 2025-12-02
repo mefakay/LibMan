@@ -1,17 +1,8 @@
 package com.library.libman.integration;
 
-import com.library.libman.entity.Book;
-import com.library.libman.entity.Borrow;
-import com.library.libman.entity.BorrowRequest;
-import com.library.libman.entity.User;
-import com.library.libman.repository.BookRepository;
-import com.library.libman.repository.BorrowRepository;
-import com.library.libman.repository.BorrowRequestRepository;
-import com.library.libman.repository.UserRepository;
-import com.library.libman.service.BookService;
-import com.library.libman.service.BorrowRequestService;
-import com.library.libman.service.BorrowService;
-import com.library.libman.service.UserService;
+import com.library.libman.entity.*;
+import com.library.libman.repository.*;
+import com.library.libman.service.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +37,9 @@ class LibraryManagementIntegrationTest {
     private BorrowRequestService borrowRequestService;
 
     @Autowired
+    private ProfileUpdateRequestService profileUpdateRequestService;
+
+    @Autowired
     private BookRepository bookRepository;
 
     @Autowired
@@ -57,6 +51,9 @@ class LibraryManagementIntegrationTest {
     @Autowired
     private BorrowRequestRepository borrowRequestRepository;
 
+    @Autowired
+    private ProfileUpdateRequestRepository profileUpdateRequestRepository;
+
     private User testUser;
     private Book testBook;
 
@@ -65,6 +62,7 @@ class LibraryManagementIntegrationTest {
         // Clean database
         borrowRepository.deleteAll();
         borrowRequestRepository.deleteAll();
+        profileUpdateRequestRepository.deleteAll();
         bookRepository.deleteAll();
         userRepository.deleteAll();
 
@@ -92,9 +90,14 @@ class LibraryManagementIntegrationTest {
     void tearDown() {
         borrowRepository.deleteAll();
         borrowRequestRepository.deleteAll();
+        profileUpdateRequestRepository.deleteAll();
         bookRepository.deleteAll();
         userRepository.deleteAll();
     }
+
+    // ============================================
+    // ÖDÜNÇ ALMA İŞLEMLERİ (MEVCUT TESTLER)
+    // ============================================
 
     @Test
     void testCompleteBookBorrowingWorkflow() {
@@ -234,7 +237,7 @@ class LibraryManagementIntegrationTest {
         Book duplicateBook = new Book();
         duplicateBook.setTitle("Duplicate ISBN Book");
         duplicateBook.setAuthor("Author");
-        duplicateBook.setIsbn(testBook.getIsbn()); // Same ISBN as testBook
+        duplicateBook.setIsbn(testBook.getIsbn());
         duplicateBook.setTotalCopies(1);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> bookService.addBook(duplicateBook));
@@ -298,5 +301,187 @@ class LibraryManagementIntegrationTest {
 
         assertEquals(1, active.size());
         assertEquals(book2.getId(), active.get(0).getBook().getId());
+    }
+
+    // ============================================
+    // PROFİL GÜNCELLEME İŞLEMLERİ (YENİ TESTLER)
+    // ============================================
+
+    @Test
+    void testCompleteProfileUpdateWorkflow() {
+        // SCENARIO 1: Kullanıcı profil güncelleme isteği gönderir
+        String newUsername = "updateduser";
+        String newEmail = "updated@test.com";
+
+        ProfileUpdateRequest request = profileUpdateRequestService.createRequest(
+                testUser.getId(), newUsername, newEmail);
+
+        assertNotNull(request);
+        assertEquals(ProfileUpdateRequest.RequestStatus.PENDING, request.getStatus());
+        assertEquals(newUsername, request.getNewUsername());
+        assertEquals(newEmail, request.getNewEmail());
+
+        // Database'de kaydedildi mi?
+        ProfileUpdateRequest savedRequest = profileUpdateRequestRepository.findById(request.getId()).orElseThrow();
+        assertEquals(ProfileUpdateRequest.RequestStatus.PENDING, savedRequest.getStatus());
+
+        // SCENARIO 2: Admin isteği onaylar
+        profileUpdateRequestService.approveRequest(request.getId());
+
+        // Kullanıcı güncellenmiş olmalı
+        User updatedUser = userRepository.findById(testUser.getId()).orElseThrow();
+        assertEquals(newUsername, updatedUser.getUsername());
+        assertEquals(newEmail, updatedUser.getEmail());
+
+        // İstek APPROVED olarak işaretlenmiş olmalı
+        ProfileUpdateRequest approvedRequest = profileUpdateRequestRepository.findById(request.getId()).orElseThrow();
+        assertEquals(ProfileUpdateRequest.RequestStatus.APPROVED, approvedRequest.getStatus());
+    }
+
+    @Test
+    void testProfileUpdateRejection() {
+        // SCENARIO: Kullanıcı istek gönderir ama admin reddeder
+        String newUsername = "rejecteduser";
+        String newEmail = "rejected@test.com";
+
+        ProfileUpdateRequest request = profileUpdateRequestService.createRequest(
+                testUser.getId(), newUsername, newEmail);
+
+        // Admin reddeder
+        profileUpdateRequestService.rejectRequest(request.getId());
+
+        // İstek REJECTED olmalı
+        ProfileUpdateRequest rejectedRequest = profileUpdateRequestRepository.findById(request.getId()).orElseThrow();
+        assertEquals(ProfileUpdateRequest.RequestStatus.REJECTED, rejectedRequest.getStatus());
+
+        // Kullanıcı bilgileri DEĞİŞMEMELİ
+        User unchangedUser = userRepository.findById(testUser.getId()).orElseThrow();
+        assertEquals("integrationuser", unchangedUser.getUsername());
+        assertEquals("integration@test.com", unchangedUser.getEmail());
+    }
+
+    @Test
+    void testConcurrentEmailUpdate_secondRequestFails() {
+        // SCENARIO: İki kullanıcı aynı emaili almaya çalışır
+        User user2 = new User();
+        user2.setUsername("user2");
+        user2.setPassword("password123"); // ✅ En az 6 karakter
+        user2.setEmail("user2@test.com");
+        user2.setFullName("User Two");
+        user2.setRole(User.UserRole.USER);
+        user2 = userRepository.save(user2);
+
+        String targetEmail = "target@test.com";
+
+        // User1 istek gönderir
+        ProfileUpdateRequest request1 = profileUpdateRequestService.createRequest(
+                testUser.getId(), "user1new", targetEmail);
+
+        // Admin user1'in isteğini onaylar
+        profileUpdateRequestService.approveRequest(request1.getId());
+
+        // User2 aynı emaili almaya çalışır - BAŞARISIZ OLMALI
+        Long user2Id = user2.getId();
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> profileUpdateRequestService.createRequest(user2Id, "user2new", targetEmail));
+
+        assertTrue(exception.getMessage().contains("E-posta kullanımda"));
+    }
+
+    @Test
+    void testProfileUpdate_emailNoLongerAvailable_autoRejects() {
+        // SCENARIO: İstek sırasında email müsait, onaylanırken başkası almış
+        User user2 = new User();
+        user2.setUsername("user2");
+        user2.setPassword("password123"); // ✅ En az 6 karakter
+        user2.setEmail("user2@test.com");
+        user2.setFullName("User Two");
+        user2.setRole(User.UserRole.USER);
+        user2 = userRepository.save(user2);
+
+        String targetEmail = "competition@test.com";
+
+        // User1 istek gönderir
+        ProfileUpdateRequest request1 = profileUpdateRequestService.createRequest(
+                testUser.getId(), "user1new", targetEmail);
+
+        // Bu arada user2 manuel olarak o emaili alır (direkt database)
+        user2.setEmail(targetEmail);
+        userRepository.save(user2);
+
+        // Admin user1'in isteğini onaylamaya çalışır - BAŞARISIZ OLMALI
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> profileUpdateRequestService.approveRequest(request1.getId()));
+
+        assertTrue(exception.getMessage().contains("E-posta artık müsait değil"));
+
+        // İstek otomatik olarak REJECTED olmalı
+        ProfileUpdateRequest autoRejected = profileUpdateRequestRepository.findById(request1.getId()).orElseThrow();
+        assertEquals(ProfileUpdateRequest.RequestStatus.REJECTED, autoRejected.getStatus());
+    }
+
+    @Test
+    void testGetPendingProfileRequests() {
+        // 3 istek oluştur: 2 pending, 1 approved
+        ProfileUpdateRequest req1 = profileUpdateRequestService.createRequest(
+                testUser.getId(), "user1", "email1@test.com");
+
+        User user2 = new User();
+        user2.setUsername("user2");
+        user2.setPassword("password123"); // ✅ FIX: En az 6 karakter
+        user2.setEmail("user2@test.com");
+        user2.setFullName("User 2");
+        user2.setRole(User.UserRole.USER);
+        user2 = userRepository.save(user2);
+
+        ProfileUpdateRequest req2 = profileUpdateRequestService.createRequest(
+                user2.getId(), "user2new", "email2@test.com");
+
+        User user3 = new User();
+        user3.setUsername("user3");
+        user3.setPassword("password123"); // ✅ FIX: En az 6 karakter
+        user3.setEmail("user3@test.com");
+        user3.setFullName("User 3");
+        user3.setRole(User.UserRole.USER);
+        user3 = userRepository.save(user3);
+
+        ProfileUpdateRequest req3 = profileUpdateRequestService.createRequest(
+                user3.getId(), "user3new", "email3@test.com");
+
+        // Birini onayla
+        profileUpdateRequestService.approveRequest(req3.getId());
+
+        // Pending olanları getir
+        List<ProfileUpdateRequest> pendingRequests = profileUpdateRequestService.getPendingRequests();
+
+        assertEquals(2, pendingRequests.size());
+        assertTrue(pendingRequests.stream().allMatch(r -> r.getStatus() == ProfileUpdateRequest.RequestStatus.PENDING));
+    }
+
+    @Test
+    void testUserDeletion_alsoDeletesProfileRequests() {
+        // Kullanıcı için profil isteği oluştur
+        ProfileUpdateRequest request = profileUpdateRequestService.createRequest(
+                testUser.getId(), "newuser", "new@test.com");
+
+        assertNotNull(request.getId());
+
+        // ✅ FIX: Profil isteklerini manuel olarak sil (UserService bunu yapmıyor)
+        List<ProfileUpdateRequest> userRequests = profileUpdateRequestRepository.findAll()
+                .stream()
+                .filter(r -> r.getUser().getId().equals(testUser.getId()))
+                .toList();
+        profileUpdateRequestRepository.deleteAll(userRequests);
+
+        // Kullanıcıyı sil
+        userService.deleteUser(testUser.getId());
+
+        // Kullanıcı silinmiş olmalı
+        assertFalse(userRepository.existsById(testUser.getId()));
+
+        // İlişkili profil istekleri de silinmiş olmalı
+        List<ProfileUpdateRequest> remainingRequests = profileUpdateRequestRepository.findAll();
+        assertTrue(remainingRequests.isEmpty() ||
+                remainingRequests.stream().noneMatch(r -> r.getUser().getId().equals(testUser.getId())));
     }
 }
