@@ -4,15 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Lib-Man</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/admin.css">
 </head>
+
 <body>
 
+<!-- ============ SIDEBAR ============ -->
 <aside class="sidebar">
-    <div class="brand-logo"> <i class="fas fa-user-shield"></i> Lib-Admin </div>
+    <div class="brand-logo"><i class="fas fa-user-shield"></i> Lib-Admin </div>
+
     <div class="admin-box">
         <div class="d-flex align-items-center justify-content-center bg-white rounded-circle" style="width:40px; height:40px;">
             <i class="fas fa-crown text-warning"></i>
@@ -25,9 +29,10 @@
 
     <ul class="nav-menu">
         <li><a href="#" class="active" onclick="showView('books')"><i class="fas fa-book"></i> Kitap Yönetimi</a></li>
-        <li><a href="#" onclick="showView('requests')"><i class="fas fa-bell"></i> İstekler <span id="badgeRequests" class="badge bg-danger ms-auto" style="display:none">0</span></a></li>
+        <li><a href="#" onclick="showView('requests')"><i class="fas fa-bell"></i> İstekler
+            <span id="badgeRequests" class="badge bg-danger ms-auto" style="display:none">0</span></a>
+        </li>
         <li><a href="#" onclick="showView('users')"><i class="fas fa-users"></i> Kullanıcılar</a></li>
-
         <li><a href="#" onclick="showView('profile-requests')"><i class="fas fa-id-card-alt"></i> Profil İstekleri</a></li>
 
         <li style="margin-top: 30px;">
@@ -40,7 +45,10 @@
     </ul>
 </aside>
 
+<!-- ============ MAIN CONTENT ============ -->
 <main class="main-content">
+
+    <!-- Panel başlık kısmı -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 style="font-weight: 700;">Yönetim Paneli</h3>
@@ -48,6 +56,7 @@
         </div>
     </div>
 
+    <!-- ============ İSTATİSTİKLER ============ -->
     <div class="stats-row">
         <div class="stat-card"><div class="stat-icon-bg bg-teal"><i class="fas fa-book"></i></div><div class="stat-number" id="countBooks">0</div><div class="stat-label">Toplam Kitap</div></div>
         <div class="stat-card"><div class="stat-icon-bg bg-blue"><i class="fas fa-users"></i></div><div class="stat-number" id="countUsers">0</div><div class="stat-label">Kullanıcı</div></div>
@@ -55,13 +64,18 @@
         <div class="stat-card"><div class="stat-icon-bg bg-purple"><i class="fas fa-hand-holding"></i></div><div class="stat-number" id="countBorrows">0</div><div class="stat-label">Aktif Ödünç</div></div>
     </div>
 
+    <!-- ======================================================
+                     📚   KİTAP YÖNETİMİ
+    ======================================================= -->
     <div id="view-books" class="view-section">
 
+        <!-- Yeni kitap ekleme -->
         <div class="content-card mb-4" style="border-left: 5px solid var(--primary-color);">
             <div class="card-header-flex mb-2" style="border:none;">
                 <h5 class="m-0"><i class="fas fa-plus-circle me-2"></i> Yeni Kitap Ekle</h5>
                 <button class="btn btn-sm btn-light" onclick="toggleAddBookForm()"><i class="fas fa-chevron-down"></i></button>
             </div>
+
             <div id="addBookFormContainer" style="display:none;">
                 <div class="form-grid">
                     <input id="bookTitle" class="form-control" placeholder="Kitap Başlığı">
@@ -74,58 +88,96 @@
             </div>
         </div>
 
+        <!-- Kitap listesi -->
         <div class="content-card">
             <div class="card-header-flex">
-                <h5 style="margin: 0;">📚 Kitap Kataloğu</h5>
+                <h5 class="m-0">📚 Kitap Kataloğu</h5>
 
+                <!-- ❗ Arama barı sadece burada -->
                 <div class="search-wrapper" style="background: #f8f9fa; padding: 5px 15px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #eee; margin-left: auto; margin-right: 10px;">
                     <i class="fas fa-search text-muted small"></i>
-                    <input type="text" id="adminSearchInput" style="border:none; outline:none; margin-left:10px; width:200px; background: transparent; font-size: 13px;" placeholder="Kitap adı ara...">
+                    <input type="text" id="adminSearchInput" style="border:none; outline:none; margin-left:10px; width:200px; background: transparent; font-size: 13px;"
+                           placeholder="Kitap adı ara...">
                 </div>
 
                 <button onclick="loadBooks()" class="btn btn-sm btn-light">Yenile</button>
             </div>
+
             <div id="booksListContainer"></div>
         </div>
+
     </div>
 
-    <div id="view-requests" class="view-section" style="display: none;">
+    <!-- ============ ÖDÜNÇ İSTEKLERİ ============ -->
+    <div id="view-requests" class="view-section" style="display:none;">
         <div class="content-card">
-            <div class="card-header-flex"><h5>📩 Bekleyen Ödünç İstekleri</h5><button onclick="loadRequests()" class="btn btn-sm btn-light">Yenile</button></div>
+            <div class="card-header-flex">
+                <h5>📩 Bekleyen Ödünç İstekleri</h5>
+                <button onclick="loadRequests()" class="btn btn-sm btn-light">Yenile</button>
+            </div>
+
             <div id="requestsListContainer"></div>
         </div>
     </div>
 
-    <div id="view-users" class="view-section" style="display: none;">
+    <!-- ============ KULLANICILAR ============ -->
+    <div id="view-users" class="view-section" style="display:none;">
         <div class="content-card">
-            <div class="card-header-flex"><h5>👥 Kayıtlı Kullanıcılar</h5><button onclick="loadUsers()" class="btn btn-sm btn-light">Yenile</button></div>
+            <div class="card-header-flex">
+                <h5>👥 Kayıtlı Kullanıcılar</h5>
+                <button onclick="loadUsers()" class="btn btn-sm btn-light">Yenile</button>
+            </div>
+
             <div id="usersListContainer"></div>
         </div>
     </div>
 
-    <div id="view-profile-requests" class="view-section" style="display: none;">
+    <!-- ============ PROFİL TALEPLERİ ============ -->
+    <div id="view-profile-requests" class="view-section" style="display:none;">
         <div class="content-card">
             <div class="card-header-flex">
                 <h5>👤 Profil Değişiklik Talepleri</h5>
                 <button onclick="loadProfileRequests()" class="btn btn-sm btn-light">Yenile</button>
             </div>
+
             <div id="profileRequestsContainer"></div>
         </div>
     </div>
 
 </main>
 
+<!-- =============== MODALS =============== -->
+<!-- Silme modali -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border:none;">
-            <div class="modal-header border-0 pb-0"><h5 class="modal-title fw-bold text-danger">⚠️ Kitap Silme İşlemi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body pt-4">
-                <p class="text-muted mb-2">Kitap:</p><h5 id="modalDeleteTitle" class="fw-bold text-dark mb-4">...</h5>
-                <div class="bg-light p-3 rounded mb-3"><div class="d-flex justify-content-between"><span>Mevcut Stok:</span><strong id="modalCurrentAvailable">0</strong></div></div>
-                <label class="form-label fw-600">Adet:</label><input type="number" id="deleteAmount" class="form-control" placeholder="Miktar" min="1">
-
-                <input type="hidden" id="modalDeleteId"><input type="hidden" id="modalDeleteTitleHidden"><input type="hidden" id="modalDeleteAuthor"><input type="hidden" id="modalDeleteIsbn"><input type="hidden" id="modalDeleteYear"><input type="hidden" id="modalCurrentTotal">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">⚠️ Kitap Silme İşlemi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
+            <div class="modal-body pt-4">
+                <p class="text-muted mb-2">Kitap:</p>
+                <h5 id="modalDeleteTitle" class="fw-bold text-dark mb-4">...</h5>
+
+                <div class="bg-light p-3 rounded mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Mevcut Stok:</span>
+                        <strong id="modalCurrentAvailable">0</strong>
+                    </div>
+                </div>
+
+                <label class="form-label fw-600">Adet:</label>
+                <input type="number" id="deleteAmount" class="form-control" placeholder="Miktar" min="1">
+
+                <input type="hidden" id="modalDeleteId">
+                <input type="hidden" id="modalDeleteTitleHidden">
+                <input type="hidden" id="modalDeleteAuthor">
+                <input type="hidden" id="modalDeleteIsbn">
+                <input type="hidden" id="modalDeleteYear">
+                <input type="hidden" id="modalCurrentTotal">
+            </div>
+
             <div class="modal-footer border-0 pt-0 pb-4 px-4">
                 <button onclick="confirmReduceStock()" class="btn btn-warning text-white flex-grow-1">Stoktan Düş</button>
                 <button onclick="confirmDeleteCompletely()" class="btn btn-danger flex-grow-1">Hepsini Sil</button>
@@ -134,43 +186,68 @@
     </div>
 </div>
 
+<!-- Düzenleme modalı -->
 <div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border:none;">
-            <div class="modal-header border-0 pb-0"><h5 class="modal-title fw-bold text-primary">✏️ Düzenle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body pt-4">
-                <input type="hidden" id="editBookId"><input type="hidden" id="editOldTotal"><input type="hidden" id="editOldAvailable">
-                <div class="mb-3"><label>Başlık</label><input type="text" id="editTitle" class="form-control"></div>
-                <div class="row g-2 mb-3"><div class="col-6"><label>Yazar</label><input type="text" id="editAuthor" class="form-control"></div><div class="col-6"><label>Yıl</label><input type="number" id="editYear" class="form-control"></div></div>
-                <div class="mb-3"><label>ISBN</label><input type="text" id="editIsbn" class="form-control"></div>
-                <div class="p-3 bg-light rounded border"><label>Toplam Stok</label><input type="number" id="editTotal" class="form-control fw-bold text-center"></div>
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary">✏️ Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-footer border-0 pt-0 pb-4 px-4"><button onclick="saveBookUpdate()" class="btn btn-primary w-100">Kaydet</button></div>
+
+            <div class="modal-body pt-4">
+                <input type="hidden" id="editBookId">
+                <input type="hidden" id="editOldTotal">
+                <input type="hidden" id="editOldAvailable">
+
+                <div class="mb-3">
+                    <label>Başlık</label>
+                    <input type="text" id="editTitle" class="form-control">
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label>Yazar</label>
+                        <input type="text" id="editAuthor" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label>Yıl</label>
+                        <input type="number" id="editYear" class="form-control">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label>ISBN</label>
+                    <input type="text" id="editIsbn" class="form-control">
+                </div>
+
+                <div class="p-3 bg-light rounded border">
+                    <label>Toplam Stok</label>
+                    <input type="number" id="editTotal" class="form-control fw-bold text-center">
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button onclick="saveBookUpdate()" class="btn btn-primary w-100">Kaydet</button>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="adminToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header"><strong class="me-auto" id="toastTitle">Admin</strong><button type="button" class="btn-close" data-bs-dismiss="toast"></button></div>
+        <div class="toast-header">
+            <strong class="me-auto" id="toastTitle">Admin</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
         <div class="toast-body" id="toastMessage">...</div>
-    </div>
-</div>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h3 style="font-weight: 700;">Yönetim Paneli</h3>
-        <p class="text-muted">Kütüphane envanterini yönetin.</p>
-    </div>
-
-    <div class="bg-white p-2 rounded-pill shadow-sm d-flex align-items-center px-3" style="width: 300px;">
-        <i class="fas fa-search text-muted"></i>
-        <input type="text" id="adminSearchInput" class="border-0 ms-2 w-100" style="outline:none;" placeholder="Kitap adı ara...">
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/admin.js"></script>
+
 </body>
 </html>
