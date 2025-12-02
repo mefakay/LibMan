@@ -2,8 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* Talib Edu Tasarım Renkleri */
-    --primary-color: #00b894; /* Teal/Yeşil */
+    --primary-color: #00b894;
     --primary-light: #e6f7f4;
     --text-dark: #2d3436;
     --text-gray: #636e72;

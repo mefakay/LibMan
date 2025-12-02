@@ -145,10 +145,10 @@
     color: var(--text-gray);
 }
 
-/* LISTE ALANI (Book List) */
+/* LISTE ALANI  */
 .content-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Sol geniş, sağ dar */
+    grid-template-columns: 2fr 1fr;
     gap: 30px;
 }
 
@@ -166,7 +166,7 @@
     margin-bottom: 25px;
 }
 
-/* Özel Liste Elemanları */
+/* Liste Elemanları */
 .custom-list-item {
     display: flex;
     align-items: center;

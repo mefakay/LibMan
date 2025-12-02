@@ -44,13 +44,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Statik kaynaklara izin ver
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                        // Login ve Register sayfalarına izin ver
                         .requestMatchers("/login", "/register", "/api/auth/**", "/api/register").permitAll()
-                        // HATA ÇÖZÜMÜ İÇİN KRİTİK SATIR:
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                        // Diğer her şey için giriş gerekli
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

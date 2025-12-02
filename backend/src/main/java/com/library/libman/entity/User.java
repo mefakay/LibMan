@@ -8,9 +8,6 @@ import org.springframework.lang.NonNull;
 @Table(name = "users")
 public class User {
 
-    //User entity classının içeriği
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,8 +40,8 @@ public class User {
     private UserRole role;
     
     public enum UserRole {
-        ADMIN,      // Yönetici
-        USER        // Normal kullanıcı
+        ADMIN,
+        USER
     }
     
   

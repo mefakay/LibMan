@@ -71,7 +71,6 @@ public class UserController {
         }
     }
 
-    // PROFİL GÜNCELLEME İSTEĞİ
     @PostMapping("/settings/profile-request")
     public ResponseEntity<?> requestProfileUpdate(@RequestBody User tempUser, Authentication auth) {
         try {
@@ -83,7 +82,6 @@ public class UserController {
         }
     }
 
-    // KENDİ BİLGİLERİNİ GETİR
     @GetMapping("/me")
     public ResponseEntity<User> getMe(Authentication auth) {
         User user = userService.getUserByUsername(auth.getName());
@@ -93,11 +91,9 @@ public class UserController {
 
     @GetMapping("/books/search")
     public ResponseEntity<List<Book>> searchBooks(@RequestParam(required = false) String title) {
-        // Eğer arama kutusu boşsa tüm kitapları getir
         if (title == null || title.trim().isEmpty()) {
             return ResponseEntity.ok(bookService.getAllBooks());
         }
-        // Doluysa isme göre getir (Mevcut metodun)
         return ResponseEntity.ok(bookService.getBooksByTitle(title));
     }
 }

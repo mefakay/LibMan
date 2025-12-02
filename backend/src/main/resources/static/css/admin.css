@@ -1,6 +1,6 @@
 /* resources/static/css/admin.css */
 
-/* USER CSS ile aynı temel yapı */
+/* aynı temel yapı */
 .sidebar {
     width: var(--sidebar-width);
     height: 100vh;
@@ -24,7 +24,7 @@
 }
 
 .admin-box {
-    background: #e6f7f4; /* Admin için hafif yeşil arka plan */
+    background: #e6f7f4;
     padding: 15px;
     border-radius: 12px;
     display: flex;
@@ -62,7 +62,7 @@
 /* KARTLAR VE GRID */
 .stats-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Admin'de 4 istatistik olsun */
+    grid-template-columns: repeat(4, 1fr);
     gap: 25px;
     margin-bottom: 30px;
 }
@@ -92,7 +92,6 @@
 .stat-number { font-size: 24px; font-weight: 700; color: var(--text-dark); }
 .stat-label { font-size: 13px; color: var(--text-gray); }
 
-/* CONTENT AREA */
 .content-card {
     background: var(--bg-white);
     border-radius: 16px;

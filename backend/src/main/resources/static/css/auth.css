@@ -16,22 +16,21 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px; /* Mobilde kenarlara yapışmasın */
+    padding: 20px;
 }
 
 /* KART YAPISI */
 .auth-container {
     background: #fff;
-    width: 900px;
-    /* height: 600px;  <-- BU SATIRI SİLDİK (Sabit yükseklik kesilmeye neden oluyordu) */
-    min-height: 600px; /* En az 600px olsun ama içerik çoksa uzasın */
+    width: 900px;/
+    min-height: 600px;
     border-radius: 20px;
     box-shadow: 0 15px 50px rgba(0,0,0,0.1);
     overflow: hidden;
     display: flex;
 }
 
-/* SOL TARAF (Görsel Alanı) */
+/* SOL TARAF  */
 .auth-left {
     flex: 1;
     background: linear-gradient(135deg, #00b894 0%, #0984e3 100%);
@@ -43,7 +42,6 @@ body {
     padding: 40px;
     text-align: center;
     position: relative;
-    /* Sol taraf sağ taraf kadar uzasın diye flex varsayılanı zaten stretch'tir */
 }
 
 .auth-left::before {
@@ -67,18 +65,15 @@ body {
 .auth-left h2 { font-weight: 700; margin-bottom: 10px; z-index: 1; }
 .auth-left p { font-size: 14px; opacity: 0.9; z-index: 1; line-height: 1.6; }
 
-/* SAĞ TARAF (Form Alanı) */
+/* SAĞ TARAF */
 .auth-right {
     flex: 1;
     padding: 50px;
     display: flex;
     flex-direction: column;
-    /* justify-content: center; <-- BU SATIRI SİLDİK (İçerik çoksa yukarı kaçmasın diye) */
-    justify-content: center; /* Eğer sığıyorsa ortalasın, sığmıyorsa margin ile iteceğiz */
+    justify-content: center;
 }
 
-/* Eğer içerik çok uzunsa justify-content center sorun çıkarabilir,
-   o yüzden mobilde veya taşma durumunda auto yapıyoruz */
 @media (max-height: 700px) {
     .auth-right { justify-content: flex-start; padding-top: 30px; padding-bottom: 30px;}
 }
@@ -168,12 +163,11 @@ body {
     font-size: 13px;
     margin-bottom: 20px;
     display: flex; align-items: center; gap: 10px;
-    word-break: break-word; /* Uzun hatalar taşmasın, alt satıra geçsin */
+    word-break: break-word; /* Uzun hatalar taşmasın */
 }
 .alert-error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
 .alert-success { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
 
-/* MOBİL UYUMLULUK */
 @media (max-width: 768px) {
     .auth-container {
         width: 100%;

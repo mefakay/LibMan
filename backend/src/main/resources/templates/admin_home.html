@@ -13,7 +13,6 @@
 
 <body>
 
-<!-- ============ SIDEBAR ============ -->
 <aside class="sidebar">
     <div class="brand-logo"><i class="fas fa-user-shield"></i> Lib-Admin </div>
 
@@ -45,7 +44,6 @@
     </ul>
 </aside>
 
-<!-- ============ MAIN CONTENT ============ -->
 <main class="main-content">
 
     <!-- Panel başlık kısmı -->
@@ -56,7 +54,7 @@
         </div>
     </div>
 
-    <!-- ============ İSTATİSTİKLER ============ -->
+    <!-- İSTATİSTİKLER -->
     <div class="stats-row">
         <div class="stat-card"><div class="stat-icon-bg bg-teal"><i class="fas fa-book"></i></div><div class="stat-number" id="countBooks">0</div><div class="stat-label">Toplam Kitap</div></div>
         <div class="stat-card"><div class="stat-icon-bg bg-blue"><i class="fas fa-users"></i></div><div class="stat-number" id="countUsers">0</div><div class="stat-label">Kullanıcı</div></div>
@@ -64,9 +62,8 @@
         <div class="stat-card"><div class="stat-icon-bg bg-purple"><i class="fas fa-hand-holding"></i></div><div class="stat-number" id="countBorrows">0</div><div class="stat-label">Aktif Ödünç</div></div>
     </div>
 
-    <!-- ======================================================
-                     📚   KİTAP YÖNETİMİ
-    ======================================================= -->
+    <!--
+               KİTAP YÖNETİMİ -->
     <div id="view-books" class="view-section">
 
         <!-- Yeni kitap ekleme -->
@@ -93,7 +90,7 @@
             <div class="card-header-flex">
                 <h5 class="m-0">📚 Kitap Kataloğu</h5>
 
-                <!-- ❗ Arama barı sadece burada -->
+                <!--  Arama barı  -->
                 <div class="search-wrapper" style="background: #f8f9fa; padding: 5px 15px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #eee; margin-left: auto; margin-right: 10px;">
                     <i class="fas fa-search text-muted small"></i>
                     <input type="text" id="adminSearchInput" style="border:none; outline:none; margin-left:10px; width:200px; background: transparent; font-size: 13px;"
@@ -108,7 +105,7 @@
 
     </div>
 
-    <!-- ============ ÖDÜNÇ İSTEKLERİ ============ -->
+    <!-- ÖDÜNÇ İSTEK -->
     <div id="view-requests" class="view-section" style="display:none;">
         <div class="content-card">
             <div class="card-header-flex">
@@ -120,7 +117,7 @@
         </div>
     </div>
 
-    <!-- ============ KULLANICILAR ============ -->
+    <!-- KULLANICILA -->
     <div id="view-users" class="view-section" style="display:none;">
         <div class="content-card">
             <div class="card-header-flex">
@@ -132,7 +129,7 @@
         </div>
     </div>
 
-    <!-- ============ PROFİL TALEPLERİ ============ -->
+    <!-- PROFİL TALEP-->
     <div id="view-profile-requests" class="view-section" style="display:none;">
         <div class="content-card">
             <div class="card-header-flex">
@@ -146,8 +143,7 @@
 
 </main>
 
-<!-- =============== MODALS =============== -->
-<!-- Silme modali -->
+<!-- Silme  -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border:none;">
@@ -186,7 +182,7 @@
     </div>
 </div>
 
-<!-- Düzenleme modalı -->
+<!-- Düzenleme -->
 <div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border:none;">
@@ -234,7 +230,6 @@
     </div>
 </div>
 
-<!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="adminToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">

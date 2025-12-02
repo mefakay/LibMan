@@ -11,60 +11,34 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Web sayfaları ve kimlik doğrulama işlemleri için controller.
- * Login, Register sayfalarını gösterir ve kayıt işlemlerini yönetir.
- */
+
 @Controller
 public class WebController {
 
     @Autowired
     private UserService userService;
 
-    // ============================================
-    // SAYFA GÖSTERİMLERİ (GET)
-    // ============================================
-
-    /**
-     * Kayıt sayfasını gösterir
-     */
     @GetMapping("/register")
     public String register() {
         return "register";
     }
 
-    /**
-     * Giriş sayfasını gösterir
-     */
     @GetMapping("/login")
     public String login() {
         return "login";
     }
 
-    /**
-     * Ana sayfa - Kullanıcı rolüne göre yönlendirir
-     */
     @GetMapping("/home")
     public String home(Authentication authentication, Model model) {
-        // Admin ise admin paneline yönlendir
         if (authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
             return "admin_home";
         }
 
-        // Kullanıcı ise kullanıcı paneline yönlendir
         model.addAttribute("username", authentication.getName());
         return "user_home";
     }
 
-    // ============================================
-    // KAYIT İŞLEMLERİ (POST)
-    // ============================================
-
-    /**
-     * Web formundan gelen kayıt isteğini işler (Thymeleaf form)
-     * Form: /api/auth/register
-     */
     @PostMapping("/api/auth/register")
     public String registerUserForm(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
         try {
@@ -78,10 +52,6 @@ public class WebController {
         }
     }
 
-    /**
-     * REST API kayıt endpoint'i (JSON)
-     * Endpoint: POST /api/register
-     */
     @PostMapping("/api/register")
     @ResponseBody
     public ResponseEntity<?> registerUserApi(@RequestBody User user) {

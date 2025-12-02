@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService {
     private BorrowRequestRepository borrowRequestRepository;
 
     @Autowired
-    private ProfileUpdateRequestRepository profileUpdateRequestRepository; // ✅ YENİ
+    private ProfileUpdateRequestRepository profileUpdateRequestRepository;
 
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
@@ -71,27 +71,27 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    // KULLANICI SİLME (İlişkili verilerle beraber)
+    // KULLANICI SİLME
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        // 1. Kullanıcının profil güncelleme isteklerini sil (✅ YENİ)
+        //  Kullanıcının profil güncelleme isteklerini sil
         var profileRequests = profileUpdateRequestRepository.findAll()
                 .stream()
                 .filter(r -> r.getUser().getId().equals(userId))
                 .toList();
         profileUpdateRequestRepository.deleteAll(profileRequests);
 
-        // 2. Kullanıcının ödünç isteklerini sil
+        //  Kullanıcının ödünç isteklerini sil
         var requests = borrowRequestRepository.findByUser(user);
         borrowRequestRepository.deleteAll(requests);
 
-        // 3. Kullanıcının ödünç kayıtlarını sil
+        //  Kullanıcının ödünç kayıtlarını sil
         var borrows = borrowRepository.findByUser(user);
         borrowRepository.deleteAll(borrows);
 
-        // 4. Kullanıcıyı sil
+        // Kullanıcıyı sil
         userRepository.delete(user);
     }
 }

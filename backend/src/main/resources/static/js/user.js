@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-/* --- MENÜ GEÇİŞ FONKSİYONU --- */
+/* MENÜ GEÇİŞ */
 function showSection(section, element) {
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
     if(element) element.classList.add('active');
@@ -46,8 +46,7 @@ function showSection(section, element) {
     }
 }
 
-// ... (loadBooks, loadMyBooks, loadMyRequests, updateStats, searchUserBooks vb. AYNI KALACAK)
-// Aşağısı önceki kodların aynısıdır.
+// loadBooks, loadMyBooks, loadMyRequests, updateStats, searchUserBooks
 
 async function searchUserBooks(query) {
     const container = document.getElementById('bookListContainer');
@@ -55,7 +54,7 @@ async function searchUserBooks(query) {
     // Sadece Katalog sekmesinde çalışsın
     const activeLink = document.querySelector('.nav-menu a.active');
     if(activeLink && !activeLink.innerText.includes('Ana Panel')) {
-         return; // Başka sekmedeyse arama yapma
+         return;
     }
 
     try {
@@ -179,8 +178,7 @@ function renderList(list) {
     container.innerHTML = html;
 }
 
-// ... (updateStats, showError, borrowRequest, vb. DİĞERLERİ AYNI)
-// Bu kısımları önceki kodundan aynen kopyalayabilirsin.
+// updateStats, showError, borrowRequest,
 
 async function updateStats() {
     try {
@@ -250,7 +248,7 @@ async function returnBook() {
     if(id) returnBookViaList(id);
 }
 
-// PROFİL AYARLARI FONKSİYONLARI (Zaten yukarıda vardı, buraya tekrar ekledim eksiksiz olsun diye)
+// PROFİL AYARLARI
 async function openSettingsModal() {
     try {
         const user = await apiGet('/user/me');

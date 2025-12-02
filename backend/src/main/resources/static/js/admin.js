@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     loadBooks();
     document.getElementById('view-books').style.display = 'block';
 
-    // ARAMA DİNLEYİCİSİ (YENİLENDİ)
+    // ARAMA DİNLEYİCİSİ
     const searchInput = document.getElementById('adminSearchInput');
     if(searchInput) {
         searchInput.addEventListener('keyup', function(e) {
@@ -28,8 +28,8 @@ function showView(viewName) {
     if(viewName === 'profile-requests') loadProfileRequests(); // YENİ
 }
 
-// ... (loadStats, loadBooks, loadRequests, vb. ESKİ FONKSİYONLAR AYNI KALACAK) ...
-// Buradaki tek fark "loadUsers" içine "Sil" butonu eklemek ve aşağıya yeni fonksiyonları eklemek.
+// ... (loadStats, loadBooks, loadRequests,  ...
+// "loadUsers" içine "Sil" butonu eklemek ve aşağıya yeni fonksiyonları eklemek.
 
 async function loadStats() {
     try {
@@ -88,7 +88,6 @@ async function loadUsers() {
         const users = await apiGet('/admin/users');
         let html = '';
         users.forEach(u => {
-            // YENİ: SİL BUTONU
             const deleteBtn = u.role === 'ADMIN' ? '' : `<button onclick="deleteUser(${u.id})" class="btn btn-sm btn-light text-danger"><i class="fas fa-trash-alt"></i></button>`;
 
             html += `
@@ -110,7 +109,6 @@ async function loadUsers() {
 async function searchAdminBooks(query) {
     const container = document.getElementById('booksListContainer');
 
-    // Eğer kutu boşsa normal listeyi getir
     if (!query || query.trim() === '') {
         loadBooks();
         return;
@@ -124,7 +122,6 @@ async function searchAdminBooks(query) {
             return;
         }
 
-        // Listeyi Çiz (loadBooks içindeki yapının aynısı)
         let html = '';
         books.forEach(book => {
             const safeTitle = book.title.replace(/'/g, "\\'");
@@ -155,7 +152,7 @@ async function searchAdminBooks(query) {
     } catch (e) { console.error(e); }
 }
 
-// === YENİ: KULLANICI SİLME ===
+// KULLANICI SİLME
 async function deleteUser(id) {
     if(!confirm("DİKKAT! Bu kullanıcıyı sildiğinizde tüm geçmişi silinir. Emin misiniz?")) return;
     try {
@@ -165,7 +162,7 @@ async function deleteUser(id) {
     } catch(e) { showToast('Hata', e.message); }
 }
 
-// === YENİ: PROFİL İSTEKLERİNİ YÖNETME ===
+// PROFİL İSTEKLERİNİ YÖNETME
 async function loadProfileRequests() {
     const container = document.getElementById('profileRequestsContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';
@@ -203,9 +200,7 @@ async function rejectProfile(id) {
     catch(e) { showToast('Hata', e.message); }
 }
 
-// === DİĞER (Kitap Ekle/Sil/Düzenle, Ödünç İstekleri) KODLAR AYNEN KALACAK ===
-// (Yer kaplamaması için buraya tekrar yapıştırmıyorum, önceki admin.js'den kopyalayabilirsin.
-// Sadece yukarıdaki loadBooks, loadUsers ve yeni fonksiyonları güncellemen yeterli)
+
 
 function openDeleteModal(id, title, author, isbn, year, total, available) {
     document.getElementById('modalDeleteId').value = id;

@@ -29,7 +29,7 @@ public class AdminController {
     @Autowired private BorrowRequestService requestService;
     @Autowired private ProfileUpdateRequestService profileRequestService;
 
-    // --- KİTAP İŞLEMLERİ ---
+    //  KİTAP İŞLEMLERİ
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
@@ -63,7 +63,7 @@ public class AdminController {
         }
     }
 
-    // --- KULLANICI İŞLEMLERİ ---
+    // KULLANICI İŞLEMLERİ
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -79,7 +79,7 @@ public class AdminController {
         }
     }
 
-    // --- ÖDÜNÇ VE İSTEK İŞLEMLERİ ---
+    // ÖDÜNÇ VE İSTEK İŞLEMLERİ
     @GetMapping("/borrows")
     public ResponseEntity<List<Borrow>> getAllBorrows() {
         return ResponseEntity.ok(borrowService.getAllBorrows());
@@ -108,7 +108,7 @@ public class AdminController {
         }
     }
 
-    // --- PROFİL GÜNCELLEME İSTEKLERİ ---
+    //PROFİL GÜNCELLEME İSTEKLERİ
     @GetMapping("/profile-requests/pending")
     public ResponseEntity<?> getProfileRequests() {
         return ResponseEntity.ok(profileRequestService.getPendingRequests());
@@ -132,11 +132,9 @@ public class AdminController {
 
     @GetMapping("/books/search")
     public ResponseEntity<List<Book>> searchBooks(@RequestParam(required = false) String title) {
-        // Eğer arama kutusu boşsa tüm kitapları getir
         if (title == null || title.trim().isEmpty()) {
             return ResponseEntity.ok(bookService.getAllBooks());
         }
-        // Doluysa isme göre getir (Mevcut metodun)
         return ResponseEntity.ok(bookService.getBooksByTitle(title));
     }
 }
