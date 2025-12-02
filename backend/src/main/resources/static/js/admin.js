@@ -4,6 +4,14 @@ document.addEventListener("DOMContentLoaded", function() {
     loadStats();
     loadBooks();
     document.getElementById('view-books').style.display = 'block';
+
+    // ARAMA DİNLEYİCİSİ (YENİLENDİ)
+    const searchInput = document.getElementById('adminSearchInput');
+    if(searchInput) {
+        searchInput.addEventListener('keyup', function(e) {
+            searchAdminBooks(e.target.value);
+        });
+    }
 });
 
 function showView(viewName) {
@@ -97,6 +105,54 @@ async function loadUsers() {
         });
         container.innerHTML = html;
     } catch(e) { container.innerHTML = 'Hata.'; }
+}
+
+async function searchAdminBooks(query) {
+    const container = document.getElementById('booksListContainer');
+
+    // Eğer kutu boşsa normal listeyi getir
+    if (!query || query.trim() === '') {
+        loadBooks();
+        return;
+    }
+
+    try {
+        const books = await apiGet(`/admin/books/search?title=${encodeURIComponent(query)}`);
+
+        if(books.length === 0) {
+            container.innerHTML = '<div class="text-muted text-center py-3">Sonuç bulunamadı.</div>';
+            return;
+        }
+
+        // Listeyi Çiz (loadBooks içindeki yapının aynısı)
+        let html = '';
+        books.forEach(book => {
+            const safeTitle = book.title.replace(/'/g, "\\'");
+            const safeAuthor = book.author.replace(/'/g, "\\'");
+            const year = book.publicationYear || 0;
+
+            html += `
+            <div class="custom-list-item">
+                <div class="item-left">
+                    <div class="item-icon" style="background:#e0f2f1; color:#009688;">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0 fw-bold">${book.title}</h6>
+                        <span class="text-muted" style="font-size:12px;">${book.author} • Stok: ${book.availableCopies}/${book.totalCopies}</span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="openEditModal(${book.id}, '${safeTitle}', '${safeAuthor}', '${book.isbn}', ${year}, ${book.totalCopies}, ${book.availableCopies})"
+                            class="btn btn-sm btn-light text-primary"><i class="fas fa-edit"></i></button>
+                    <button onclick="openDeleteModal(${book.id}, '${safeTitle}', '${safeAuthor}', '${book.isbn}', ${year}, ${book.totalCopies}, ${book.availableCopies})"
+                            class="btn btn-sm btn-light text-danger"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+
+    } catch (e) { console.error(e); }
 }
 
 // === YENİ: KULLANICI SİLME ===

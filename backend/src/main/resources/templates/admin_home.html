@@ -56,6 +56,7 @@
     </div>
 
     <div id="view-books" class="view-section">
+
         <div class="content-card mb-4" style="border-left: 5px solid var(--primary-color);">
             <div class="card-header-flex mb-2" style="border:none;">
                 <h5 class="m-0"><i class="fas fa-plus-circle me-2"></i> Yeni Kitap Ekle</h5>
@@ -65,15 +66,25 @@
                 <div class="form-grid">
                     <input id="bookTitle" class="form-control" placeholder="Kitap Başlığı">
                     <input id="bookAuthor" class="form-control" placeholder="Yazar">
-                    <input id="bookIsbn" class="form-control" placeholder="ISBN">
+                    <input id="bookIsbn" class="form-control" placeholder="ISBN (978-...)">
                     <input id="bookYear" type="number" class="form-control" placeholder="Yıl">
                     <input id="bookTotal" type="number" class="form-control" value="5" placeholder="Stok">
                 </div>
                 <button onclick="addBook()" class="btn btn-primary mt-3 w-100">Kaydet</button>
             </div>
         </div>
+
         <div class="content-card">
-            <div class="card-header-flex"><h5>📚 Kitap Kataloğu</h5><button onclick="loadBooks()" class="btn btn-sm btn-light">Yenile</button></div>
+            <div class="card-header-flex">
+                <h5 style="margin: 0;">📚 Kitap Kataloğu</h5>
+
+                <div class="search-wrapper" style="background: #f8f9fa; padding: 5px 15px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #eee; margin-left: auto; margin-right: 10px;">
+                    <i class="fas fa-search text-muted small"></i>
+                    <input type="text" id="adminSearchInput" style="border:none; outline:none; margin-left:10px; width:200px; background: transparent; font-size: 13px;" placeholder="Kitap adı ara...">
+                </div>
+
+                <button onclick="loadBooks()" class="btn btn-sm btn-light">Yenile</button>
+            </div>
             <div id="booksListContainer"></div>
         </div>
     </div>
@@ -143,6 +154,18 @@
     <div id="adminToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header"><strong class="me-auto" id="toastTitle">Admin</strong><button type="button" class="btn-close" data-bs-dismiss="toast"></button></div>
         <div class="toast-body" id="toastMessage">...</div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 style="font-weight: 700;">Yönetim Paneli</h3>
+        <p class="text-muted">Kütüphane envanterini yönetin.</p>
+    </div>
+
+    <div class="bg-white p-2 rounded-pill shadow-sm d-flex align-items-center px-3" style="width: 300px;">
+        <i class="fas fa-search text-muted"></i>
+        <input type="text" id="adminSearchInput" class="border-0 ms-2 w-100" style="outline:none;" placeholder="Kitap adı ara...">
     </div>
 </div>
 

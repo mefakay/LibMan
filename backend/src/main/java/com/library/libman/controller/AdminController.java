@@ -129,4 +129,14 @@ public class AdminController {
         profileRequestService.rejectRequest(id);
         return ResponseEntity.ok("Reddedildi");
     }
+
+    @GetMapping("/books/search")
+    public ResponseEntity<List<Book>> searchBooks(@RequestParam(required = false) String title) {
+        // Eğer arama kutusu boşsa tüm kitapları getir
+        if (title == null || title.trim().isEmpty()) {
+            return ResponseEntity.ok(bookService.getAllBooks());
+        }
+        // Doluysa isme göre getir (Mevcut metodun)
+        return ResponseEntity.ok(bookService.getBooksByTitle(title));
+    }
 }

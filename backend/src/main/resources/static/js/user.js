@@ -6,63 +6,67 @@ let allBooks = [];
 document.addEventListener("DOMContentLoaded", function() {
     loadBooks();
     updateStats();
+
+    // ARAMA DİNLEYİCİSİ
+    const searchInput = document.getElementById('searchInput');
+    if(searchInput) {
+        searchInput.addEventListener('keyup', function(e) {
+            searchUserBooks(e.target.value);
+        });
+    }
 });
 
 /* --- MENÜ GEÇİŞ FONKSİYONU --- */
-function showSection(section) {
+function showSection(section, element) {
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
-    // (Settings butonu bu fonksiyonu kullanmadığı için hata vermemesi adına kontrol)
-    if(event.target.closest('a').onclick.toString().includes('showSection')) {
-        event.target.closest('a').classList.add('active');
-    }
+    if(element) element.classList.add('active');
 
-    const listTitle = document.querySelector('.content-card h4') || document.querySelector('.content-card h5');
+    const listTitle = document.getElementById('listTitle');
     const container = document.getElementById('bookListContainer');
+    const searchContainer = document.getElementById('searchContainer'); // Arama kutusunun div'i
+    const refreshBtn = document.getElementById('refreshBtn');
 
     container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-success"></div></div>';
 
     if (section === 'catalog') {
-        if(listTitle) listTitle.innerText = '📚 Kitap Kataloğu';
+        listTitle.innerText = '📚 Kitap Kataloğu';
+        searchContainer.style.display = 'flex'; // Katalogda GÖSTER
+        refreshBtn.setAttribute('onclick', 'loadBooks()');
         loadBooks();
     } else if (section === 'mybooks') {
-        if(listTitle) listTitle.innerText = '📖 Ödünç Aldıklarım';
+        listTitle.innerText = '📖 Ödünç Aldıklarım';
+        searchContainer.style.display = 'none'; // Diğerlerinde GİZLE
+        refreshBtn.setAttribute('onclick', 'loadMyBooks()');
         loadMyBooks();
     } else if (section === 'requests') {
-        if(listTitle) listTitle.innerText = '⏳ İsteklerim';
+        listTitle.innerText = '⏳ İsteklerim';
+        searchContainer.style.display = 'none'; // Diğerlerinde GİZLE
+        refreshBtn.setAttribute('onclick', 'loadMyRequests()');
         loadMyRequests();
     }
 }
 
-// === YENİ: PROFİL AYARLARI FONKSİYONLARI ===
+// ... (loadBooks, loadMyBooks, loadMyRequests, updateStats, searchUserBooks vb. AYNI KALACAK)
+// Aşağısı önceki kodların aynısıdır.
 
-async function openSettingsModal() {
-    try {
-        // Kullanıcının mevcut bilgilerini çek
-        const user = await apiGet('/user/me');
-        document.getElementById('reqUsername').value = user.username;
-        document.getElementById('reqEmail').value = user.email;
-        new bootstrap.Modal(document.getElementById('settingsModal')).show();
-    } catch (e) { showToast('Hata', 'Bilgiler alınamadı.'); }
-}
+async function searchUserBooks(query) {
+    const container = document.getElementById('bookListContainer');
 
-async function submitProfileRequest() {
-    const data = {
-        username: document.getElementById('reqUsername').value,
-        email: document.getElementById('reqEmail').value
-    };
-
-    try {
-        await apiPost('/user/settings/profile-request', data);
-        showToast('Başarılı', 'İsteğiniz yöneticiye iletildi.');
-        bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
-    } catch(e) {
-        // Backend'den gelen "Bu mail kullanılıyor" hatası burada gösterilecek
-        showToast('Hata', e.message);
+    // Sadece Katalog sekmesinde çalışsın
+    const activeLink = document.querySelector('.nav-menu a.active');
+    if(activeLink && !activeLink.innerText.includes('Ana Panel')) {
+         return; // Başka sekmedeyse arama yapma
     }
-}
 
-// ... (loadBooks, loadMyBooks, loadMyRequests, updateStats, vb. ESKİ FONKSİYONLARIN AYNI KALACAK)
-// Aşağısı önceki kodların aynısıdır, kopyala yapıştır yapabilirsin.
+    try {
+        const books = await apiGet(`/user/books/search?title=${encodeURIComponent(query)}`);
+        if (!books || books.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-3">Sonuç bulunamadı.</div>';
+            return;
+        }
+        renderList(books);
+    } catch (error) { console.error(error); }
+}
 
 async function loadBooks() {
     const container = document.getElementById('bookListContainer');
@@ -175,6 +179,9 @@ function renderList(list) {
     container.innerHTML = html;
 }
 
+// ... (updateStats, showError, borrowRequest, vb. DİĞERLERİ AYNI)
+// Bu kısımları önceki kodundan aynen kopyalayabilirsin.
+
 async function updateStats() {
     try {
         const [books, borrows, requests] = await Promise.all([
@@ -241,6 +248,30 @@ async function returnBookViaList(id) {
 async function returnBook() {
     const id = document.getElementById('returnIdInput').value;
     if(id) returnBookViaList(id);
+}
+
+// PROFİL AYARLARI FONKSİYONLARI (Zaten yukarıda vardı, buraya tekrar ekledim eksiksiz olsun diye)
+async function openSettingsModal() {
+    try {
+        const user = await apiGet('/user/me');
+        document.getElementById('reqUsername').value = user.username;
+        document.getElementById('reqEmail').value = user.email;
+        new bootstrap.Modal(document.getElementById('settingsModal')).show();
+    } catch (e) { showToast('Hata', 'Bilgiler alınamadı.'); }
+}
+
+async function submitProfileRequest() {
+    const data = {
+        username: document.getElementById('reqUsername').value,
+        email: document.getElementById('reqEmail').value
+    };
+    try {
+        await apiPost('/user/settings/profile-request', data);
+        showToast('Başarılı', 'İsteğiniz yöneticiye iletildi.');
+        bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+    } catch(e) {
+        showToast('Hata', e.message);
+    }
 }
 
 function showToast(title, msg) {

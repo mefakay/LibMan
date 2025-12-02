@@ -25,9 +25,9 @@
     </div>
 
     <ul class="nav-menu">
-        <li><a href="#" class="active" onclick="showSection('catalog')"><i class="fas fa-th-large"></i> Ana Panel</a></li>
-        <li><a href="#" onclick="showSection('mybooks')"><i class="fas fa-book"></i> Kitaplarım</a></li>
-        <li><a href="#" onclick="showSection('requests')"><i class="fas fa-clock"></i> İstekler</a></li>
+        <li><a href="#" class="active" onclick="showSection('catalog', this)"><i class="fas fa-th-large"></i> Ana Panel</a></li>
+        <li><a href="#" onclick="showSection('mybooks', this)"><i class="fas fa-book"></i> Kitaplarım</a></li>
+        <li><a href="#" onclick="showSection('requests', this)"><i class="fas fa-clock"></i> İstekler</a></li>
 
         <li><a href="#" onclick="openSettingsModal()"><i class="fas fa-user-cog"></i> Profil Ayarları</a></li>
 
@@ -43,10 +43,9 @@
 
 <main class="main-content">
 
-    <div class="header-section">
+    <div class="header-section mb-4">
         <div>
-            <h2 style="font-weight: 700; margin-bottom: 5px;">Hoşgeldin! 👋</h2>
-            <p class="text-muted">Bugün kütüphanede neler keşfetmek istersin?</p>
+            <h2 style="font-weight: 700; margin-bottom: 0;">Hoşgeldin! 👋</h2>
         </div>
     </div>
 
@@ -67,8 +66,14 @@
 
         <div class="content-card">
             <div class="card-header-flex">
-                <h4 style="font-weight: 600;">📚 Kitap Kataloğu</h4>
-                <button class="btn btn-sm btn-light" onclick="loadBooks()">Yenile</button>
+                <h4 style="font-weight: 600;" id="listTitle">📚 Kitap Kataloğu</h4>
+
+                <div id="searchContainer" class="search-wrapper" style="background: #f8f9fa; padding: 5px 15px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #eee;">
+                    <i class="fas fa-search text-muted small"></i>
+                    <input type="text" id="searchInput" style="border:none; outline:none; margin-left:10px; width:150px; background: transparent; font-size: 13px;" placeholder="Ara...">
+                </div>
+
+                <button id="refreshBtn" class="btn btn-sm btn-light ms-2" onclick="loadBooks()">Yenile</button>
             </div>
 
             <div id="bookListContainer">
@@ -110,17 +115,14 @@
                 <div class="alert alert-info small">
                     <i class="fas fa-info-circle"></i> Güvenlik gereği, kullanıcı adı ve e-posta değişiklikleri <b>yönetici onayı</b> gerektirir.
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label fw-600">Kullanıcı Adı</label>
                     <input type="text" id="reqUsername" class="form-control">
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label fw-600">E-posta Adresi</label>
                     <input type="email" id="reqEmail" class="form-control">
                 </div>
-
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button onclick="submitProfileRequest()" class="btn btn-primary w-100">Değişiklik İsteği Gönder</button>
