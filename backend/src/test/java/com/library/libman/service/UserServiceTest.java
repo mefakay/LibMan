@@ -80,8 +80,4 @@ class UserServiceTest {
         assertTrue(ex.getMessage().contains("Kullanıcı bulunamadı"));
         verify(userRepository, times(1)).findByUsername(username);
     }
-
-   
-    
-
 }

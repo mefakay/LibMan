@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
@@ -294,7 +293,7 @@ class AdminControllerTest {
     }
 
     // ============================================
-    // PROFİL GÜNCELLEME İSTEKLERİ TESTLERİ (YENİ)
+    // PROFİL GÜNCELLEME İSTEKLERİ TESTLERİ
     // ============================================
 
     @Test

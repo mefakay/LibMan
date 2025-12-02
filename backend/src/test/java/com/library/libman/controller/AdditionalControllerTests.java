@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Ek Controller testleri - Coverage artırımı için
  * Edge case'ler ve özel senaryolar
  */
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class AdditionalControllerTests {
@@ -96,7 +97,7 @@ class AdditionalControllerTests {
         // WHEN & THEN
         mockMvc.perform(delete("/api/admin/books/999")
                 .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                        .csrf()))
+                .csrf()))
                 .andExpect(status().isNotFound());
 
         verify(bookService, times(1)).deleteBook(999L);

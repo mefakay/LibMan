@@ -214,7 +214,7 @@ class UserControllerTest {
     }
 
     // ============================================
-    // PROFİL GÜNCELLEME TESTLERİ (YENİ)
+    // PROFİL GÜNCELLEME TESTLERİ
     // ============================================
 
     @Test

@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Integration Test - Gerçek veritabanı ile test eder
  * H2 in-memory database kullanır
  */
+
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Transactional
@@ -304,7 +305,7 @@ class LibraryManagementIntegrationTest {
     }
 
     // ============================================
-    // PROFİL GÜNCELLEME İŞLEMLERİ (YENİ TESTLER)
+    // PROFİL GÜNCELLEME İŞLEMLERİ
     // ============================================
 
     @Test
@@ -365,7 +366,7 @@ class LibraryManagementIntegrationTest {
         // SCENARIO: İki kullanıcı aynı emaili almaya çalışır
         User user2 = new User();
         user2.setUsername("user2");
-        user2.setPassword("password123"); // ✅ En az 6 karakter
+        user2.setPassword("password123"); // En az 6 karakter
         user2.setEmail("user2@test.com");
         user2.setFullName("User Two");
         user2.setRole(User.UserRole.USER);
@@ -393,7 +394,7 @@ class LibraryManagementIntegrationTest {
         // SCENARIO: İstek sırasında email müsait, onaylanırken başkası almış
         User user2 = new User();
         user2.setUsername("user2");
-        user2.setPassword("password123"); // ✅ En az 6 karakter
+        user2.setPassword("password123"); // En az 6 karakter
         user2.setEmail("user2@test.com");
         user2.setFullName("User Two");
         user2.setRole(User.UserRole.USER);
@@ -428,7 +429,7 @@ class LibraryManagementIntegrationTest {
 
         User user2 = new User();
         user2.setUsername("user2");
-        user2.setPassword("password123"); // ✅ FIX: En az 6 karakter
+        user2.setPassword("password123"); // En az 6 karakter
         user2.setEmail("user2@test.com");
         user2.setFullName("User 2");
         user2.setRole(User.UserRole.USER);
@@ -439,7 +440,7 @@ class LibraryManagementIntegrationTest {
 
         User user3 = new User();
         user3.setUsername("user3");
-        user3.setPassword("password123"); // ✅ FIX: En az 6 karakter
+        user3.setPassword("password123"); // En az 6 karakter
         user3.setEmail("user3@test.com");
         user3.setFullName("User 3");
         user3.setRole(User.UserRole.USER);
@@ -466,7 +467,7 @@ class LibraryManagementIntegrationTest {
 
         assertNotNull(request.getId());
 
-        // ✅ FIX: Profil isteklerini manuel olarak sil (UserService bunu yapmıyor)
+        // Profil isteklerini manuel olarak sil (UserService bunu yapmıyor)
         List<ProfileUpdateRequest> userRequests = profileUpdateRequestRepository.findAll()
                 .stream()
                 .filter(r -> r.getUser().getId().equals(testUser.getId()))
