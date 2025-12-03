@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Ek Controller testleri - Coverage artırımı için
  * Edge case'ler ve özel senaryolar
  */
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class AdditionalControllerTest {
@@ -207,7 +208,7 @@ class AdditionalControllerTest {
         }
 
         // ============================================
-        // AUTHENTICATION TESTLER - DÜZELTİLDİ
+        // AUTHENTICATION TESTLER
         // ============================================
 
         @Test
@@ -291,9 +292,6 @@ class AdditionalControllerTest {
         // WEB CONTROLLER (/home, /login, /register) - BRANCH TESTLERİ
         // ============================================
 
-        /**
-         * /login view'inin döndüğünü test eder (WebController.login)
-         */
         @Test
         void loginView_returnsLoginTemplate() throws Exception {
                 mockMvc.perform(get("/login"))
@@ -301,9 +299,6 @@ class AdditionalControllerTest {
                                 .andExpect(view().name("login"));
         }
 
-        /**
-         * /register view'inin döndüğünü test eder (WebController.register)
-         */
         @Test
         void registerView_returnsRegisterTemplate() throws Exception {
                 mockMvc.perform(get("/register"))
@@ -311,11 +306,6 @@ class AdditionalControllerTest {
                                 .andExpect(view().name("register"));
         }
 
-        /**
-         * /home içinde:
-         * if (ROLE_ADMIN) -> "admin_home" view'ini döndürür.
-         * Bu test if'in ADMIN kolunu kaplar.
-         */
         @Test
         @WithMockUser(username = "adminUser", roles = "ADMIN")
         void home_whenAdmin_returnsAdminHomeView() throws Exception {
@@ -324,12 +314,6 @@ class AdditionalControllerTest {
                                 .andExpect(view().name("admin_home"));
         }
 
-        /**
-         * /home içinde:
-         * ROLE_ADMIN yoksa:
-         * model'e username eklenir ve "user_home" döner.
-         * Bu test if'in ELSE kolunu kaplar.
-         */
         @Test
         @WithMockUser(username = "normalUser", roles = "USER")
         void home_whenUser_returnsUserHomeViewWithUsername() throws Exception {

@@ -169,15 +169,12 @@ class AdminControllerTest {
         verify(bookService, times(1)).updateBook(eq(1L), any(Book.class));
     }
 
-    // >>> YENİ EKLENEN TESTLER – searchBooks IF'İNİN HER İKİ KOLUNU DA KAPSAR <<<
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void searchBooks_withoutTitle_returnsAllBooks() throws Exception {
         List<Book> books = List.of(testBook);
         when(bookService.getAllBooks()).thenReturn(books);
 
-        // title parametresi YOK → if (title == null || empty) TRUE
         mockMvc.perform(get("/api/admin/books/search"))
                 .andExpect(status().isOk());
 

@@ -10,10 +10,10 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // adla bulma
+    // kullanıcı adına göre bulma
     Optional<User> findByUsername(String username);
     
-    // maille göre bulma
+    // maile göre bulma
     Optional<User> findByEmail(String email);
 }
 

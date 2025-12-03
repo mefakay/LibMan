@@ -13,10 +13,10 @@ import java.util.Optional;
 @Repository
 public interface BorrowRequestRepository extends JpaRepository<BorrowRequest, Long> {
     
-    //  ödünç istekitaplar
+    //  kitapları ödünç iste
     List<BorrowRequest> findByUser(User user);
 
-    // bekle ödünç istekleri
+    // ödünç isteklerini bekle
     List<BorrowRequest> findByUserAndStatus(User user, BorrowRequest.RequestStatus status);
 
     // ayırma

@@ -97,7 +97,7 @@ class LibraryManagementIntegrationTest {
     }
 
     // ============================================
-    // ÖDÜNÇ ALMA İŞLEMLERİ (MEVCUT TESTLER)
+    // ÖDÜNÇ ALMA İŞLEMLERİ
     // ============================================
 
     @Test

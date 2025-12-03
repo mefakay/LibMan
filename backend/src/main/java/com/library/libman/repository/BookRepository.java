@@ -16,7 +16,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     //kitap arama
     Optional<Book> findByTitle(String title);
 
-    //büyükküçük harf duyarlılığı yok
+    //büyük-küçük harf duyarlılığı yok
     List<Book> findByTitleContainingIgnoreCase(String title);
 }
 

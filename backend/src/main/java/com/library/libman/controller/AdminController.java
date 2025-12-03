@@ -63,7 +63,7 @@ public class AdminController {
         }
     }
 
-    // kullanici işlemi
+    // kullanıcı işlemi
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());

@@ -99,17 +99,10 @@ class UserControllerTest {
                 verify(bookService, times(1)).getAllBooks();
         }
 
-        /**
-         * /api/user/books/search endpoint'i:
-         * title YOKKEN veya boşken:
-         * if (title == null || title.trim().isEmpty()) -> TRUE
-         * bookService.getAllBooks() çağrılmalı.
-         */
         @Test
         void searchBooks_withoutTitle_returnsAllBooks() throws Exception {
                 when(bookService.getAllBooks()).thenReturn(List.of(testBook));
 
-                // title parametresi vermiyoruz -> null kabul edilir, if TRUE
                 mockMvc.perform(get("/api/user/books/search"))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.length()").value(1))
@@ -119,12 +112,6 @@ class UserControllerTest {
                 verify(bookService, never()).getBooksByTitle(anyString());
         }
 
-        /**
-         * /api/user/books/search endpoint'i:
-         * title VARSA ve boş değilse:
-         * if (...) FALSE
-         * bookService.getBooksByTitle(title) çağrılmalı.
-         */
         @Test
         void searchBooks_withTitle_returnsFilteredBooks() throws Exception {
                 when(bookService.getBooksByTitle("Test Book")).thenReturn(List.of(testBook));
