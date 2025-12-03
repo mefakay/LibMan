@@ -221,7 +221,7 @@ class AdditionalControllerTest {
 
         @Test
         @WithMockUser(roles = "USER")
-        void adminEndpoint_withUserRole_returnsForbiddenOrBadRequest() throws Exception {
+        void adminEndpoint_withUserRole_returnsClientError() throws Exception {
                 // WHEN & THEN - Spring Security 403 veya 400 dönebilir
                 mockMvc.perform(delete("/api/admin/books/1")
                                 .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
@@ -285,5 +285,57 @@ class AdditionalControllerTest {
                 mockMvc.perform(get("/api/admin/books"))
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType("application/json"));
+        }
+
+        // ============================================
+        // WEB CONTROLLER (/home, /login, /register) - BRANCH TESTLERİ
+        // ============================================
+
+        /**
+         * /login view'inin döndüğünü test eder (WebController.login)
+         */
+        @Test
+        void loginView_returnsLoginTemplate() throws Exception {
+                mockMvc.perform(get("/login"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("login"));
+        }
+
+        /**
+         * /register view'inin döndüğünü test eder (WebController.register)
+         */
+        @Test
+        void registerView_returnsRegisterTemplate() throws Exception {
+                mockMvc.perform(get("/register"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("register"));
+        }
+
+        /**
+         * /home içinde:
+         * if (ROLE_ADMIN) -> "admin_home" view'ini döndürür.
+         * Bu test if'in ADMIN kolunu kaplar.
+         */
+        @Test
+        @WithMockUser(username = "adminUser", roles = "ADMIN")
+        void home_whenAdmin_returnsAdminHomeView() throws Exception {
+                mockMvc.perform(get("/home"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("admin_home"));
+        }
+
+        /**
+         * /home içinde:
+         * ROLE_ADMIN yoksa:
+         * model'e username eklenir ve "user_home" döner.
+         * Bu test if'in ELSE kolunu kaplar.
+         */
+        @Test
+        @WithMockUser(username = "normalUser", roles = "USER")
+        void home_whenUser_returnsUserHomeViewWithUsername() throws Exception {
+                mockMvc.perform(get("/home"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("user_home"))
+                                .andExpect(model().attribute("username", "normalUser"));
         }
 }

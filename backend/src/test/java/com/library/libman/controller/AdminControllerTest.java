@@ -169,6 +169,37 @@ class AdminControllerTest {
         verify(bookService, times(1)).updateBook(eq(1L), any(Book.class));
     }
 
+    // >>> YENİ EKLENEN TESTLER – searchBooks IF'İNİN HER İKİ KOLUNU DA KAPSAR <<<
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void searchBooks_withoutTitle_returnsAllBooks() throws Exception {
+        List<Book> books = List.of(testBook);
+        when(bookService.getAllBooks()).thenReturn(books);
+
+        // title parametresi YOK → if (title == null || empty) TRUE
+        mockMvc.perform(get("/api/admin/books/search"))
+                .andExpect(status().isOk());
+
+        verify(bookService, times(1)).getAllBooks();
+        verify(bookService, never()).getBooksByTitle(anyString());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void searchBooks_withTitle_returnsFilteredBooks() throws Exception {
+        List<Book> books = List.of(testBook);
+        when(bookService.getBooksByTitle("Test Book")).thenReturn(books);
+
+        // title parametresi VAR → if şartı FALSE → else kolu
+        mockMvc.perform(get("/api/admin/books/search")
+                .param("title", "Test Book"))
+                .andExpect(status().isOk());
+
+        verify(bookService, times(1)).getBooksByTitle("Test Book");
+        verify(bookService, never()).getAllBooks();
+    }
+
     // ============================================
     // KULLANICI İŞLEMLERİ TESTLERİ
     // ============================================
@@ -201,10 +232,8 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteUser_success() throws Exception {
-        // GIVEN
         doNothing().when(userService).deleteUser(1L);
 
-        // WHEN & THEN
         mockMvc.perform(delete("/api/admin/users/1")
                 .with(csrf()))
                 .andExpect(status().isOk())
@@ -216,11 +245,9 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteUser_throws_whenUserNotFound() throws Exception {
-        // GIVEN
         doThrow(new RuntimeException("Kullanıcı bulunamadı"))
                 .when(userService).deleteUser(999L);
 
-        // WHEN & THEN
         mockMvc.perform(delete("/api/admin/users/999")
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
@@ -275,7 +302,6 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void getAllBorrows_returnsOk() throws Exception {
-        // GIVEN
         Borrow borrow = new Borrow();
         borrow.setId(1L);
         borrow.setUser(testUser);
@@ -284,7 +310,6 @@ class AdminControllerTest {
 
         when(borrowService.getAllBorrows()).thenReturn(List.of(borrow));
 
-        // WHEN & THEN
         mockMvc.perform(get("/api/admin/borrows"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1));
@@ -299,7 +324,6 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void getProfileRequests_returnsOk() throws Exception {
-        // GIVEN
         ProfileUpdateRequest req1 = new ProfileUpdateRequest();
         req1.setId(1L);
         req1.setUser(testUser);
@@ -309,7 +333,6 @@ class AdminControllerTest {
 
         when(profileUpdateRequestService.getPendingRequests()).thenReturn(List.of(req1));
 
-        // WHEN & THEN
         mockMvc.perform(get("/api/admin/profile-requests/pending"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -322,10 +345,8 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void approveProfileRequest_success() throws Exception {
-        // GIVEN
         doNothing().when(profileUpdateRequestService).approveRequest(1L);
 
-        // WHEN & THEN
         mockMvc.perform(post("/api/admin/profile-requests/1/approve")
                 .with(csrf()))
                 .andExpect(status().isOk())
@@ -337,11 +358,9 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void approveProfileRequest_throws_whenEmailNotAvailable() throws Exception {
-        // GIVEN
         doThrow(new RuntimeException("E-posta artık müsait değil"))
                 .when(profileUpdateRequestService).approveRequest(1L);
 
-        // WHEN & THEN
         mockMvc.perform(post("/api/admin/profile-requests/1/approve")
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
@@ -353,10 +372,8 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void rejectProfileRequest_success() throws Exception {
-        // GIVEN
         doNothing().when(profileUpdateRequestService).rejectRequest(1L);
 
-        // WHEN & THEN
         mockMvc.perform(post("/api/admin/profile-requests/1/reject")
                 .with(csrf()))
                 .andExpect(status().isOk())
@@ -368,7 +385,6 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void profileRequests_forbiddenForNonAdmin() throws Exception {
-        // WHEN & THEN
         mockMvc.perform(get("/api/admin/profile-requests/pending"))
                 .andExpect(result -> {
                     int status = result.getResponse().getStatus();
