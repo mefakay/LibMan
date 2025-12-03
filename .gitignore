@@ -77,7 +77,7 @@ nbdist/
 # Spring Boot
 # ============================================
 spring-boot-*.log
-application-*.properties
+application.properties
 !application.yml
 application-local.properties
 application-dev.properties
