@@ -57,7 +57,7 @@ public class WebController {
     public ResponseEntity<?> registerUserApi(@RequestBody User user) {
         try {
             User registeredUser = userService.registerUser(user);
-            registeredUser.setPassword(null); // Şifreyi response'dan çıkar
+            registeredUser.setPassword(null);
             return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

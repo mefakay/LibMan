@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-// Ödünç alma ve iade işlemlerini yöneten servis
 @Service
 public class BorrowService {
     
@@ -28,7 +27,7 @@ public class BorrowService {
     private UserRepository userRepository;
     
     
-    // Kitap ödünç alır
+    // ödünç al
     public Borrow borrowBook(@NonNull Long userId, @NonNull Long bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
@@ -37,12 +36,12 @@ public class BorrowService {
          Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + bookId));
         
-        // Kitap mevcut mu kontrol et
+        //  mevcut mu
         if (book.getAvailableCopies() <= 0) {
             throw new RuntimeException("Kitap şu anda mevcut değil: " + book.getTitle());
         }
         
-        // Kullanıcı bu kitabı zaten ödünç almış mı kontrol et
+        // almış mı kontrol
         Optional<Borrow> existingBorrow = borrowRepository.findByUserAndBookAndStatus(
                 user, book, Borrow.BorrowStatus.ACTIVE);
         
@@ -52,21 +51,21 @@ public class BorrowService {
             throw new RuntimeException("Bu kitabı zaten ödünç almışsınız: " + book.getTitle());
         }
         
-        // Yeni ödünç kaydı oluştur
+        // ödünç
         Borrow borrow = new Borrow();
             borrow.setUser(user);
         borrow.setBook(book);
         borrow.setBorrowDate(LocalDate.now());
         borrow.setStatus(Borrow.BorrowStatus.ACTIVE);
         
-        // Kitabın mevcut kopya sayısını azalt
+        // kopya azalt
         book.setAvailableCopies(book.getAvailableCopies() - 1);
         bookRepository.save(book);
         
         return borrowRepository.save(borrow);
     }
     
-    // Kitabı iade eder
+    // iade
     public Borrow returnBook(@NonNull Long borrowId) {
         Borrow borrow = borrowRepository.findById(borrowId)
                 .orElseThrow(() -> new RuntimeException("Ödünç kaydı bulunamadı: " + borrowId));
@@ -75,12 +74,11 @@ public class BorrowService {
         if (borrow.getStatus() == Borrow.BorrowStatus.RETURNED) {
             throw new RuntimeException("Bu kitap zaten iade edilmiş");
         }
-        
-        // İade işlemini yap
+
         borrow.setReturnDate(LocalDate.now());
         borrow.setStatus(Borrow.BorrowStatus.RETURNED);
         
-        // Kitabın mevcut kopya sayısını artır
+        // kopya artır
         Book book = borrow.getBook();
         if (book.getAvailableCopies() < book.getTotalCopies()) {
                 book.setAvailableCopies(book.getAvailableCopies() + 1);
@@ -90,7 +88,7 @@ public class BorrowService {
             return borrowRepository.save(borrow);
     }
     
-    // Kullanıcının tüm ödünç kayıtlarını getirir
+    // ödünç kayıtları
     public List<Borrow> getUserBorrows(@NonNull Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
@@ -99,7 +97,7 @@ public class BorrowService {
     }
     
 
-    // Kullanıcının aktif ödünç kayıtlarını getirir
+    // aktif ödünç
     public List<Borrow> getUserActiveBorrows(@NonNull Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
@@ -108,14 +106,14 @@ public class BorrowService {
         return borrowRepository.findByUserAndStatus(user, Borrow.BorrowStatus.ACTIVE);
     }
     
-    // Tüm ödünç kayıtlarını getirir
+    // hepsi
     public List<Borrow> getAllBorrows() {
         return borrowRepository.findAll();
     }
     
 
-    
-    // Kullanıcı adı ve kitap ID ile aktif ödünç kaydını bulur
+
+    // ödünç kaydını bulur
     public Borrow getActiveBorrowByUsernameAndBook(@NonNull String username, @NonNull Long bookId) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + username));

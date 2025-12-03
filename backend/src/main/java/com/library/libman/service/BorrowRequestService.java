@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-// Ödünç alma requestlerini yöneten servis
 @Service
 public class BorrowRequestService {
     
@@ -30,8 +29,8 @@ public class BorrowRequestService {
     
      @Autowired
     private BorrowRepository borrowRepository;
-    
-    // Kitap ödünç isteği alır
+
+    // ödünç isteği
     public BorrowRequest borrowRequestBook(Long userId, Long bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
@@ -40,12 +39,12 @@ public class BorrowRequestService {
          Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + bookId));
         
-        // Kitap mevcut mu kontrol et
+        // mevcut mu
         if (book.getAvailableCopies() <= 0) {
             throw new RuntimeException("Kitap şu anda mevcut değil: " + book.getTitle());
         }
         
-        // Kullanıcı bu kitaba zaten request atmış mı kontrol et
+        // request  kontrol et
         Optional<BorrowRequest> existingBorrowRequest = borrowRequestRepository.findByUserAndBookAndStatus(
                 user, book, BorrowRequest.RequestStatus.PENDING);
         
@@ -53,7 +52,7 @@ public class BorrowRequestService {
             throw new RuntimeException("Bu kitaba zaten ödünç alma isteği yolladınız: " + book.getTitle());
         }
 
-        // Kullanıcı bu kitabı zaten ödünç almış mı kontrol et
+        // almış mı
         Optional<Borrow> existingBorrow = borrowRepository.findByUserAndBookAndStatus(
                 user, book, Borrow.BorrowStatus.ACTIVE);
         
@@ -61,21 +60,21 @@ public class BorrowRequestService {
             throw new RuntimeException("Bu kitabı zaten ödünç almışsınız: " + book.getTitle());
         }
         
-        // Yeni ödünç isteği oluştur
+        //ödünç isteği
         BorrowRequest borrowRequest = new BorrowRequest();
         borrowRequest.setUser(user);
         borrowRequest.setBook(book);
         borrowRequest.setRequestDate(LocalDate.now());
         borrowRequest.setStatus(BorrowRequest.RequestStatus.PENDING);
         
-        //Rezerve içim kitabın mevcut kopya sayısını azalt
+        //mevcut azalt
         book.setAvailableCopies(book.getAvailableCopies() - 1);
         bookRepository.save(book);
         
         return borrowRequestRepository.save(borrowRequest);
     }
     
-    // Borrow requesti kabul eder
+    // equest kabul
     public Borrow acceptRequest(Long borrowRequestId) {
         BorrowRequest borrowRequest = borrowRequestRepository.findById(borrowRequestId)
                 .orElseThrow(() -> new RuntimeException("Ödünç isteği bulunamadı: " + borrowRequestId));
@@ -85,12 +84,12 @@ public class BorrowRequestService {
             throw new RuntimeException("Bu kitap zaten ödünç alınmış");
         }
         
-        // Borrow request'i güncelle
+        //requestgüncelle
         borrowRequest.setProcessedDate(LocalDate.now());
         borrowRequest.setStatus(BorrowRequest.RequestStatus.APPROVED);
         borrowRequestRepository.save(borrowRequest);
 
-        // Yeni ödünç kaydı oluştur
+        // ödünç kaydı
         Borrow borrow = new Borrow();
         borrow.setUser(borrowRequest.getUser());
         borrow.setBook(borrowRequest.getBook());
@@ -100,7 +99,7 @@ public class BorrowRequestService {
             return borrowRepository.save(borrow);
     }
 
-    // Admin talebi reddeder
+    // red
     public BorrowRequest rejectRequest(Long requestId) {
         BorrowRequest request = borrowRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Ödünç isteği bulunamadı: " + requestId));
@@ -115,14 +114,13 @@ public class BorrowRequestService {
         Book book = bookRepository.findById(request.getBook().getId())
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + request.getBook().getId()));
 
-        //Rezerve listesinden kalktığı için kitabın mevcut kopya sayısını artır
+        //kopya artır
         book.setAvailableCopies(book.getAvailableCopies() + 1);
         bookRepository.save(book);
         
         return borrowRequestRepository.save(request);
     }
 
-    // Kullanıcının aktif ödünç istekleri getirir
     public List<BorrowRequest> getUserBorrowRequests(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + userId));
@@ -131,20 +129,19 @@ public class BorrowRequestService {
         return borrowRequestRepository.findByUser(user);
     }
     
-    // Tüm ödünç isteklerini getirir
+    // ödünç istekleri
     public List<BorrowRequest> getAllBorrowRequests() {
         return borrowRequestRepository.findAll();
     }
 
-    //    
-    // Beklenen isteklerini getirir
+
+    // Beklenen istekler
     public List<BorrowRequest> getPendingBorrowRequests() {
         return borrowRequestRepository.findByStatus(BorrowRequest.RequestStatus.PENDING);
     }
-    //
 
     
-    // Kullanıcı adı ve kitap ID ile aktif ödünç isteğini bulur
+    // ödünç isteğini bulur
     public BorrowRequest getActiveBorrowRequestByUsernameAndBook(String username, Long bookId) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + username));

@@ -6,15 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-//Database işlemleri için repository classı
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    
-    // Kullanıcı adına göre bulma
+
+    // adla bulma
     Optional<User> findByUsername(String username);
     
-    // Email'e göre bulma
+    // maille göre bulma
     Optional<User> findByEmail(String email);
 }
 

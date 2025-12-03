@@ -6,8 +6,6 @@ import jakarta.validation.constraints.*;
 @Entity
 @Table(name = "books")
 public class Book {
-    
-    //Book entity classının içeriği
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,8 +40,7 @@ public class Book {
     @Min(value = 0, message = "Mevcut kopya sayısı negatif olamaz")
     @Column(nullable = false)
     private Integer availableCopies;
-    
-    // Constructor'lar
+
     public Book() {
     }
     
@@ -56,8 +53,7 @@ public class Book {
         this.totalCopies = totalCopies;
         this.availableCopies = availableCopies;
     }
-    
-    // Getter'lar
+
     public Long getId() {
         return id;
     }
@@ -86,8 +82,7 @@ public class Book {
         return availableCopies;
     }
     
-    
-    // Setter'lar
+
     public void setId(Long id) {
         this.id = id;
     }

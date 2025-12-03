@@ -1,6 +1,4 @@
 
- //  ORTAK API YARDIMCI FONKSİYONLAR
-
 const API_BASE = 'http://localhost:8080/api';
 
 
@@ -19,8 +17,7 @@ async function apiRequest(endpoint, options = {}) {
         const response = await fetch(url, config);
 
         const text = await response.text();
-        
-        // JSON parse etmeye çalış, başarısız olursa text olarak kullan
+
         let data;
         try {
             data = text ? JSON.parse(text) : null;
@@ -29,7 +26,7 @@ async function apiRequest(endpoint, options = {}) {
         }
 
         if (!response.ok) {
-            // Validation hatalarını handle et
+            // Validation hataları
             if (data && typeof data === 'object' && data.errors) {
                 // tüm hataları birleştir
                 const errorMessages = Object.values(data.errors).join(', ');
@@ -68,15 +65,13 @@ async function apiDelete(endpoint) {
 
 
 function showToast(message, type = 'info', duration = 4000) {
-    // Toast container'ı oluştur (yoksa)
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
         container.id = 'toast-container';
         document.body.appendChild(container);
     }
-    
-    // Toast elementi oluştur
+
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
 

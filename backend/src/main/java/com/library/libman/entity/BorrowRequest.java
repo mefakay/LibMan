@@ -7,8 +7,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "borrowRequests")
 public class BorrowRequest {
-    
-    //BorrowRequest entity classının içeriği
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

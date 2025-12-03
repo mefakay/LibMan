@@ -71,27 +71,27 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    // KULLANICI SİLME
+    // kulalanı sil
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        //  Kullanıcının profil güncelleme isteklerini sil
+        //   güncelleme istekleri
         var profileRequests = profileUpdateRequestRepository.findAll()
                 .stream()
                 .filter(r -> r.getUser().getId().equals(userId))
                 .toList();
         profileUpdateRequestRepository.deleteAll(profileRequests);
 
-        //  Kullanıcının ödünç isteklerini sil
+        //  ödünç istekleri
         var requests = borrowRequestRepository.findByUser(user);
         borrowRequestRepository.deleteAll(requests);
 
-        //  Kullanıcının ödünç kayıtlarını sil
+        // ödünç kayıtları
         var borrows = borrowRepository.findByUser(user);
         borrowRepository.deleteAll(borrows);
 
-        // Kullanıcıyı sil
+        // Kullanıcı
         userRepository.delete(user);
     }
 }

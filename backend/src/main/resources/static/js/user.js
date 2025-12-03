@@ -1,4 +1,3 @@
-/* resources/static/js/user.js */
 
 const username = document.getElementById('currentUsername').value;
 let allBooks = [];
@@ -7,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function() {
     loadBooks();
     updateStats();
 
-    // ARAMA DİNLEYİCİSİ
     const searchInput = document.getElementById('searchInput');
     if(searchInput) {
         searchInput.addEventListener('keyup', function(e) {
@@ -16,42 +14,38 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-/* MENÜ GEÇİŞ */
 function showSection(section, element) {
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
     if(element) element.classList.add('active');
 
     const listTitle = document.getElementById('listTitle');
     const container = document.getElementById('bookListContainer');
-    const searchContainer = document.getElementById('searchContainer'); // Arama kutusunun div'i
+    const searchContainer = document.getElementById('searchContainer');
     const refreshBtn = document.getElementById('refreshBtn');
 
     container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-success"></div></div>';
 
     if (section === 'catalog') {
         listTitle.innerText = '📚 Kitap Kataloğu';
-        searchContainer.style.display = 'flex'; // Katalogda GÖSTER
+        searchContainer.style.display = 'flex';
         refreshBtn.setAttribute('onclick', 'loadBooks()');
         loadBooks();
     } else if (section === 'mybooks') {
         listTitle.innerText = '📖 Ödünç Aldıklarım';
-        searchContainer.style.display = 'none'; // Diğerlerinde GİZLE
+        searchContainer.style.display = 'none';
         refreshBtn.setAttribute('onclick', 'loadMyBooks()');
         loadMyBooks();
     } else if (section === 'requests') {
         listTitle.innerText = '⏳ İsteklerim';
-        searchContainer.style.display = 'none'; // Diğerlerinde GİZLE
+        searchContainer.style.display = 'none';
         refreshBtn.setAttribute('onclick', 'loadMyRequests()');
         loadMyRequests();
     }
 }
 
-// loadBooks, loadMyBooks, loadMyRequests, updateStats, searchUserBooks
-
 async function searchUserBooks(query) {
     const container = document.getElementById('bookListContainer');
 
-    // Sadece Katalog sekmesinde çalışsın
     const activeLink = document.querySelector('.nav-menu a.active');
     if(activeLink && !activeLink.innerText.includes('Ana Panel')) {
          return;
@@ -178,8 +172,6 @@ function renderList(list) {
     container.innerHTML = html;
 }
 
-// updateStats, showError, borrowRequest,
-
 async function updateStats() {
     try {
         const [books, borrows, requests] = await Promise.all([
@@ -248,7 +240,6 @@ async function returnBook() {
     if(id) returnBookViaList(id);
 }
 
-// PROFİL AYARLARI
 async function openSettingsModal() {
     try {
         const user = await apiGet('/user/me');

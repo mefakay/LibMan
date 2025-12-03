@@ -1,4 +1,4 @@
-/* resources/static/css/common.css */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
@@ -21,7 +21,6 @@ body {
     padding: 0;
 }
 
-/* Genel Button Stili */
 .btn-primary {
     background-color: var(--primary-color) !important;
     border: none;
@@ -34,7 +33,6 @@ body {
     background-color: #019577 !important;
 }
 
-/* Scrollbar düzenlemesi */
 ::-webkit-scrollbar {
     width: 8px;
 }

@@ -1,11 +1,9 @@
-/* resources/static/js/admin.js */
 
 document.addEventListener("DOMContentLoaded", function() {
     loadStats();
     loadBooks();
     document.getElementById('view-books').style.display = 'block';
 
-    // ARAMA DİNLEYİCİSİ
     const searchInput = document.getElementById('adminSearchInput');
     if(searchInput) {
         searchInput.addEventListener('keyup', function(e) {
@@ -25,11 +23,9 @@ function showView(viewName) {
     if(viewName === 'books') loadBooks();
     if(viewName === 'requests') loadRequests();
     if(viewName === 'users') loadUsers();
-    if(viewName === 'profile-requests') loadProfileRequests(); // YENİ
+    if(viewName === 'profile-requests') loadProfileRequests();
 }
 
-// ... (loadStats, loadBooks, loadRequests,  ...
-// "loadUsers" içine "Sil" butonu eklemek ve aşağıya yeni fonksiyonları eklemek.
 
 async function loadStats() {
     try {
@@ -152,7 +148,7 @@ async function searchAdminBooks(query) {
     } catch (e) { console.error(e); }
 }
 
-// KULLANICI SİLME
+// sil
 async function deleteUser(id) {
     if(!confirm("DİKKAT! Bu kullanıcıyı sildiğinizde tüm geçmişi silinir. Emin misiniz?")) return;
     try {
@@ -162,7 +158,7 @@ async function deleteUser(id) {
     } catch(e) { showToast('Hata', e.message); }
 }
 
-// PROFİL İSTEKLERİNİ YÖNETME
+// istek yönetimi
 async function loadProfileRequests() {
     const container = document.getElementById('profileRequestsContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary"></div></div>';

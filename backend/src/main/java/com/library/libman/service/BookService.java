@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// Kitap işlemlerini yöneten servis
 @Service
 public class BookService {
     
@@ -25,29 +24,27 @@ public class BookService {
     @Autowired
     private BorrowRequestRepository borrowRequestRepository;
     
-    // Tüm kitapları getirir
+    // kitapları getirir
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
     
-    // ID'ye göre kitap getirir
+    // ID kitap getirir
     public Optional<Book> getBookById(@NonNull Long id) {
         return bookRepository.findById(id);
     }
 
-    // Başlığa göre kitap arama (büyük/küçük harf duyarlılığı yok)
+    //arama
     public List<Book> getBooksByTitle(String title) {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
     
-    // Yeni kitap ekler
+    // Yeni kitap
     public Book addBook(Book book) {
-        // Aynı ISBN var mı kontrol et
         if (bookRepository.findByIsbn(book.getIsbn()).isPresent()) {
             throw new RuntimeException("Bu ISBN numarası zaten kullanılıyor: " + book.getIsbn());
         }
-        
-        // Mevcut kopya sayısı belirtilmemişse toplam kopya sayısına eşitle
+
         if (book.getAvailableCopies() == null) {
             book.setAvailableCopies(book.getTotalCopies());
         }
@@ -55,33 +52,32 @@ public class BookService {
         return bookRepository.save(book);
     }
     
-    // Kitabı siler (önce ilgili ödünç isteklerini ve ödünç kayıtlarını siler)
+    // siler
     public void deleteBook(@NonNull Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + id));
         
-        // Önce bu kitaba ait tüm ödünç isteklerini sil
+        // ödünç isteklerini sil
         var borrowRequests = borrowRequestRepository.findByBook(book);
         if (!borrowRequests.isEmpty()) {
             borrowRequestRepository.deleteAll(borrowRequests);
         }
         
-        // Sonra bu kitaba ait tüm ödünç kayıtlarını sil
+        // ödünç kayıtlarını sil
         var borrows = borrowRepository.findByBook(book);
         if (!borrows.isEmpty()) {
             borrowRepository.deleteAll(borrows);
         }
         
-        // En son kitabı sil
+        // sil
         bookRepository.deleteById(id);
     }
     
-    // Kitap bilgilerini günceller
+    // Kitap bilgilerini deüitir
     public Book updateBook(@NonNull Long id, Book updatedBook) {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kitap bulunamadı: " + id));
 
-        // String ve Integer gibi nullable alanlar için null check
         if (updatedBook.getTitle() != null && !updatedBook.getTitle().isBlank()) {
             existingBook.setTitle(updatedBook.getTitle());
         }
@@ -98,15 +94,12 @@ public class BookService {
             existingBook.setPublicationYear(updatedBook.getPublicationYear());
         }
 
-        // primitive int alanlar zaten 0 default,
-        // burada direkt kopyalamak mantıklı (testte biz bu alanları set ediyoruz zaten)
         existingBook.setTotalCopies(updatedBook.getTotalCopies());
         existingBook.setAvailableCopies(updatedBook.getAvailableCopies());
 
         return bookRepository.save(existingBook);
     }
-    
-    // Ödünç alınabilir kitapları getirir
+
     public List<Book> getAvailableBooks() {
     return bookRepository.findAll()
             .stream()

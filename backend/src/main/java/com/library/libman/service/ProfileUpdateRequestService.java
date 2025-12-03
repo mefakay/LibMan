@@ -43,7 +43,6 @@ public class ProfileUpdateRequestService {
         if (req.getStatus() != ProfileUpdateRequest.RequestStatus.PENDING) return;
 
         User user = req.getUser();
-        // Son kontrol
         if (userRepository.findByEmail(req.getNewEmail()).isPresent() && !user.getEmail().equals(req.getNewEmail())) {
             req.setStatus(ProfileUpdateRequest.RequestStatus.REJECTED);
             requestRepository.save(req);

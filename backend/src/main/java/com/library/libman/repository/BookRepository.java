@@ -7,18 +7,16 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.List;
 
-//Database işlemleri için repository classı
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
-    
-    // ISBN'e göre kitap bulma
+
     Optional<Book> findByIsbn(String isbn);
-    
-    // Başlığa göre kitap arama
+
+    //kitap arama
     Optional<Book> findByTitle(String title);
 
-    // Başlığa göre kitap arama (büyük/küçük harf duyarlılığı yok)
+    //büyükküçük harf duyarlılığı yok
     List<Book> findByTitleContainingIgnoreCase(String title);
 }
 

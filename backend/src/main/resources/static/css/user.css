@@ -1,6 +1,4 @@
-/* resources/static/css/user.css */
 
-/* SIDEBAR TASARIMI */
 .sidebar {
     width: var(--sidebar-width);
     height: 100vh;
@@ -67,7 +65,6 @@
     box-shadow: 0 4px 12px rgba(0, 184, 148, 0.25);
 }
 
-/* MAIN CONTENT ALANI */
 .main-content {
     margin-left: var(--sidebar-width);
     padding: 30px 50px;
@@ -98,10 +95,9 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* DASHBOARD KARTLARI (Üstteki 3 kutu) */
 .stats-row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* BURASI DEĞİŞTİ: 3 yerine 2 yaptık */
+    grid-template-columns: repeat(2, 1fr);
     gap: 30px;
     margin-bottom: 40px;
 }
@@ -145,7 +141,6 @@
     color: var(--text-gray);
 }
 
-/* LISTE ALANI  */
 .content-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -166,7 +161,6 @@
     margin-bottom: 25px;
 }
 
-/* Liste Elemanları */
 .custom-list-item {
     display: flex;
     align-items: center;

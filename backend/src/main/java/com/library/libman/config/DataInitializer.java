@@ -45,7 +45,7 @@ public class DataInitializer implements CommandLineRunner {
     private void addTestBooks() {
         Random random = new Random();
         
-        // 200 farklı gerçek kitap - HER BİRİ FARKLI VE TÜRKÇE!
+        // 200 kitap yüklemesi
         String[][] books = {
             {"Suç ve Ceza", "Fyodor Dostoyevski", "1866"},
             {"Savaş ve Barış", "Lev Tolstoy", "1869"},
@@ -253,12 +253,12 @@ public class DataInitializer implements CommandLineRunner {
             Book book = new Book();
             book.setTitle(books[i][0]);
             book.setAuthor(books[i][1]);
-            // Her kitap için benzersiz ISBN
+            // ISBN yükle
             book.setIsbn(String.format("978-%03d-%02d-%04d-%d", 
                 (100 + i), (i % 100), (1000 + i), (i % 10)));
             book.setPublicationYear(Integer.parseInt(books[i][2]));
             
-            // 1 ile 100 arası rastgele kopya sayısı
+            // copy sayisı
             int copies = 1 + random.nextInt(100);
             book.setTotalCopies(copies);
             book.setAvailableCopies(copies);
@@ -278,7 +278,7 @@ public class DataInitializer implements CommandLineRunner {
         admin1.setRole(User.UserRole.ADMIN);
         userRepository.save(admin1);
 
-        // --- ADMIN 2 ---
+        // 2
         User admin2 = new User();
         admin2.setUsername("duygu");
         admin2.setPassword(passwordEncoder.encode("duygu123")); // Şifre: sifre2
@@ -287,7 +287,7 @@ public class DataInitializer implements CommandLineRunner {
         admin2.setRole(User.UserRole.ADMIN);
         userRepository.save(admin2);
 
-        // --- ADMIN 3 ---
+        // 3
         User admin3 = new User();
         admin3.setUsername("kaan");
         admin3.setPassword(passwordEncoder.encode("kaan123")); // Şifre: sifre3
@@ -296,7 +296,7 @@ public class DataInitializer implements CommandLineRunner {
         admin3.setRole(User.UserRole.ADMIN);
         userRepository.save(admin3);
 
-        // --- ADMIN 4 ---
+        // 4
         User admin4 = new User();
         admin4.setUsername("fatih");
         admin4.setPassword(passwordEncoder.encode("fatih123")); // Şifre: sifre4
@@ -305,7 +305,7 @@ public class DataInitializer implements CommandLineRunner {
         admin4.setRole(User.UserRole.ADMIN);
         userRepository.save(admin4);
 
-        // --- TEST USER (Normal User) ---
+        // genel
         User testUser = new User();
         testUser.setUsername("testuser");
         testUser.setPassword(passwordEncoder.encode("test123"));

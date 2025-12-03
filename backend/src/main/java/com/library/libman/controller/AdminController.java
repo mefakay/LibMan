@@ -29,7 +29,7 @@ public class AdminController {
     @Autowired private BorrowRequestService requestService;
     @Autowired private ProfileUpdateRequestService profileRequestService;
 
-    //  KİTAP İŞLEMLERİ
+    //  kitap işlemi
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
@@ -63,7 +63,7 @@ public class AdminController {
         }
     }
 
-    // KULLANICI İŞLEMLERİ
+    // kullanici işlemi
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -79,7 +79,7 @@ public class AdminController {
         }
     }
 
-    // ÖDÜNÇ VE İSTEK İŞLEMLERİ
+    // ödünç istek
     @GetMapping("/borrows")
     public ResponseEntity<List<Borrow>> getAllBorrows() {
         return ResponseEntity.ok(borrowService.getAllBorrows());
@@ -108,7 +108,7 @@ public class AdminController {
         }
     }
 
-    //PROFİL GÜNCELLEME İSTEKLERİ
+    //güncelle profili
     @GetMapping("/profile-requests/pending")
     public ResponseEntity<?> getProfileRequests() {
         return ResponseEntity.ok(profileRequestService.getPendingRequests());

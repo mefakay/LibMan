@@ -1,7 +1,7 @@
 package com.library.libman.config;
 
 import com.library.libman.service.UserService;
-import jakarta.servlet.DispatcherType; // BU IMPORT ÖNEMLİ
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,10 +50,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")           // Controller'daki @GetMapping("/login")
-                        .loginProcessingUrl("/login")  // HTML formundaki th:action="@{/login}"
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true") // Hata olursa buraya döner
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout

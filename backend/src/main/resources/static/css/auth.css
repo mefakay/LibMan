@@ -19,7 +19,6 @@ body {
     padding: 20px;
 }
 
-/* KART YAPISI */
 .auth-container {
     background: #fff;
     width: 900px;/
@@ -30,7 +29,6 @@ body {
     display: flex;
 }
 
-/* SOL TARAF  */
 .auth-left {
     flex: 1;
     background: linear-gradient(135deg, #00b894 0%, #0984e3 100%);
@@ -65,7 +63,6 @@ body {
 .auth-left h2 { font-weight: 700; margin-bottom: 10px; z-index: 1; }
 .auth-left p { font-size: 14px; opacity: 0.9; z-index: 1; line-height: 1.6; }
 
-/* SAĞ TARAF */
 .auth-right {
     flex: 1;
     padding: 50px;
@@ -93,7 +90,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* FORM ELEMANLARI */
 .form-group { margin-bottom: 15px; }
 
 .form-label {
@@ -156,14 +152,13 @@ body {
 
 .auth-footer a:hover { text-decoration: underline; }
 
-/* Alert Mesajları */
 .alert {
     padding: 12px;
     border-radius: 8px;
     font-size: 13px;
     margin-bottom: 20px;
     display: flex; align-items: center; gap: 10px;
-    word-break: break-word; /* Uzun hatalar taşmasın */
+    word-break: break-word;
 }
 .alert-error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
 .alert-success { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
