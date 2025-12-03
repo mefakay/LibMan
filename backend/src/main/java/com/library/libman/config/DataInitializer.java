@@ -32,7 +32,8 @@ public class DataInitializer implements CommandLineRunner {
         if (    (userRepository.findByUsername("duygu").isEmpty())&&
                 (userRepository.findByUsername("ahmet").isEmpty())&&
                 (userRepository.findByUsername("fatih").isEmpty())&&
-                (userRepository.findByUsername("kaan").isEmpty())) {
+                (userRepository.findByUsername("kaan").isEmpty())&&
+                (userRepository.findByUsername("testuser").isEmpty())) {
             addTestUsers();
         }
 
@@ -304,6 +305,15 @@ public class DataInitializer implements CommandLineRunner {
         admin4.setRole(User.UserRole.ADMIN);
         userRepository.save(admin4);
 
-        System.out.println("✅ 4 Adet Admin kullanıcısı güvenli şifrelerle oluşturuldu.");
+        // --- TEST USER (Normal User) ---
+        User testUser = new User();
+        testUser.setUsername("testuser");
+        testUser.setPassword(passwordEncoder.encode("test123"));
+        testUser.setEmail("testuser@library.com");
+        testUser.setFullName("Test Kullanıcı");
+        testUser.setRole(User.UserRole.USER);
+        userRepository.save(testUser);
+
+        System.out.println("✅ 4 Adet Admin + 1 Test kullanıcısı oluşturuldu.");
     }
 }
